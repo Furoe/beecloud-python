@@ -1,0 +1,3 @@
+/dist/*
+/build/*
+beecloud.egg-info/*
