@@ -1,4 +1,4 @@
-# beecloud-python
+# BeeCloud Python SDK & Example
 ## 安装 Python SDK
 从pip快速安装  
 `pip install beecloud`  
@@ -152,41 +152,59 @@ need_address|是否需要收货地址|String(1)|T:需要</br>F:不需要</br>当
 goods_info|商品明细|String|商品明细信息,请参见 “4.2.2 goods_info参数说明”。|不可空|详见[goods_info参数样例”
 return_url|通知商户下单URL|String(128)|商户生成二维码且用户使用了二维码,创建了一笔交易,支付宝通过该路径通知商户系统下订单。</br>如果为空则不通知商户系统。格式:以“http://”或“https://” 开头。|可空|http://www.test.com/r eturn_url.aspx
 notify_url|通知商户支付结果url|String(128)|支付成功后,支付宝通过该路径通知商户支付成功,同时获取商户商品信息。</br>如果为空则不通知户系统。格式:以“http://”或“https://” 开头。</br>说明:支付宝通过何种方式获取商户商品信息,以及获取哪些信息,是在商户和支付宝签约时协商确定的。|可空|http://www.test.com/ notify_url.aspx
-query_url|查询商品信息url|String(128)|商户码(友宝售货机码)的情况下,支付宝通过该地址获取商品信息。</br>biz_type=9 时,该参数不能为空。格式:以“http://”或“https://” 开头。|可空|http://www.test.com/ query_url.aspxext_info|扩展属性|String|扩展属性,请参见“4.2.3 ext_info参数说明”。|可空|详见“ext_info参数样例”memo|备注|String(20)|备注信息。|可空|备注
+query_url|查询商品信息url|String(128)|商户码(友宝售货机码)的情况下,支付宝通过该地址获取商品信息。</br>biz_type=9 时,该参数不能为空。格式:以“http://”或“https://” 开头。|可空|http://www.test.com/ query_url.aspx
+ext_info|扩展属性|String|扩展属性,请参见“4.2.3 ext_info参数说明”。|可空|详见“ext_info参数样例”
+memo|备注|String(20)|备注信息。|可空|备注
 
 goods_info 参数样例:
 
 ```python
-{	"id": "123456",	"name": "商品名称", 
+{
+	"id": "123456",
+	"name": "商品名称", 
 	"price": "11.23", 
 	"inventory": "100", 
 	"sku_title": "请选择颜色:", 
-	"sku": [		{			"sku_id": "123456", 
+	"sku": [
+		{
+			"sku_id": "123456", 
 			"sku_name": "白色", 
 			"sku_price": "30.20", 
-			"sku_inventory": "100"		}, {			"sku_id": "123456", 
+			"sku_inventory": "100"
+		}, {
+			"sku_id": "123456", 
 			"sku_name": "白色", 
 			"sku_price": "30.20", 
-			"sku_inventory": "100"		} ],	"expiry_date": "2012-09-09 01:01:01|2012-09-19 01:02:59",	"desc": "商品描述" 
+			"sku_inventory": "100"
+		} ],
+	"expiry_date": "2012-09-09 01:01:01|2012-09-19 01:02:59",
+	"desc": "商品描述" 
 }
 ```
 
 ext_info 参数说明:  
 
 参数|参数名称|类型(长度范围)|参数说明|是否可为空|样例
----|-------|------------|------|---------|----single_limit|单次购买上限|String|单次购买上限,取值范围1~ 10,默认10。|单次购买上限必须小于或等于单用户购买上限。|可空|1user_limit|单用户购买上限|String(6)|单用户购买上限,最多6位数字,默认无限制。|可空|1
-pay_timeout|支付超时时间|String|支付超时时间,单位为分钟, 最小5分钟最大两天,默认15分钟。|可空|30logo_name|二维码logo名称|String|二维码logo名称,最多5个汉字或者10个数字/字母.|可空|二维码
+---|-------|------------|------|---------|----
+single_limit|单次购买上限|String|单次购买上限,取值范围1~ 10,默认10。|单次购买上限必须小于或等于单用户购买上限。|可空|1
+user_limit|单用户购买上限|String(6)|单用户购买上限,最多6位数字,默认无限制。|可空|1
+pay_timeout|支付超时时间|String|支付超时时间,单位为分钟, 最小5分钟最大两天,默认15分钟。|可空|30
+logo_name|二维码logo名称|String|二维码logo名称,最多5个汉字或者10个数字/字母.|可空|二维码
 ext_field|自定义收集用户信息扩展字段|String|如果商户需要用户下单时提供一些简单的信息,比如手机号、身份证号等,可以通过此字段收集。<br>目前最多支持收集 2 项。 包含以下字段:<br>input_title:输入标题,不可空,长度限制为32个字符(中英文符号都为 1 个字符);<br>input_regex:输入内容, 正则表达式,可为空。<br>手机号<br> ^[1][3-8]+\\\d{9}$<br>邮箱<br> ^\\\w+([-+.]\\\w+)\*@\\\w+([- .]\\\w+)\*\\\\.\\\w+([-.]\\w+)*$<br>身份证 <br>^(\\\d{15}\|\\\d{17}(\\\d\|X\|x)) $|可空|{"input_title": "请输入手 机号码 ","input_regex":"^[1][3-8 ]+\\\d{9}$"}
 
 ext_info 参数样例:  
 
 ```python
-{	"single_limit":"1",
+{
+	"single_limit":"1",
 	"user_limit":"1", 
 	"pay_timeout":"30", 
 	"logo_name":"二维码", 
-	"ext_field":[		{			"input_title":"请输入手机号码", 
-			"input_regex":"^[1][3-8]+\\d{9}$"		},]
+	"ext_field":[
+		{
+			"input_title":"请输入手机号码", 
+			"input_regex":"^[1][3-8]+\\d{9}$"
+		},]
 }
 ```
 
