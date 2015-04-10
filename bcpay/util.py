@@ -1,8 +1,15 @@
-import urllib
+import urllib2
+import ssl
 def httpGet(url):
     try:
-        f = urllib.urlopen(url)
+        gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        f = urllib2.urlopen(url, context = gcontext)
         s = f.read()
         return True, s
-    except:
-        return False, None
+    except :
+        try:
+            f = urllib2.urlopen(url)
+            s = f.read()
+            return True, s
+        except:
+            return False, None
