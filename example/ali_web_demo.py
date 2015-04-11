@@ -20,7 +20,7 @@ class MainHandler(tornado.web.RequestHandler):
             print data
             sHtml = data['sbHtml']
             #支付宝网页支付的html
-            #self.write(sHtml)
+            self.write(sHtml)
             biz_data = {"goods_info": { 
                     "id": "10001",
                     "name": "water ha",
@@ -38,7 +38,7 @@ class MainHandler(tornado.web.RequestHandler):
                 } 
             data = api.bc_ali_qr_pay('add', biz_data, None)
             #支付宝扫码支付的二维码图片地址
-            self.write('<img src="'+data['qr_img_url'] + '"/>')
+            #self.write('<img src="'+data['qr_img_url'] + '"/>')
         except Exception, e:
             print e
 

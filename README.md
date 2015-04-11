@@ -220,6 +220,63 @@ ext_info 参数样例:
  def bc_ali_qr_pay(self, method, biz_data, qrcode):
 ```
 
+##银联网页支付
+1.配置BeeCloud的appid和appsecrect:
+
+```python
+from bcpay.bc_api import BCApi
+BCApi.bc_app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
+BCApi.bc_app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+api = BCApi()
+```
+2.调用`bc_un_web_pay`方法调用银联支付
+
+```python
+//  @param orderId   商户系统内部的支付订单号,包含数字与字母,8-40位,确保在商户系统中唯一
+//  @param traceId   支付用户ID，必须保证在商户系统中唯一.可通过traceId查询订单详情。
+//  @param txnAmt    支付金额,以分为单位
+//  @param orderDesc 订单描述
+//  @param frontUrl  前台通知地址
+def bc_un_web_pay(self, orderId, traceId, txnAmt, orderDesc, frontUrl):
+```
+将`bc_un_web_pay `返的内容输出到空白的网页，它会自动跳转到银联的收银台。
+
+3.下面以`tornado`为例，展示完整过程： 
+>本demo可以在本地测试
+
+```python
+import json
+import tornado.httpserver
+import tornado.ioloop
+import tornado.options
+import tornado.web
+import uuid
+
+from tornado.options import define, options
+from bcpay.bc_api import BCApi
+
+define("port", default=8088, help="run on the given port", type=int)
+BCApi.bc_app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
+BCApi.bc_app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+api = BCApi()
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        data = api.bc_un_web_pay(str(uuid.uuid1()).replace('-',''), 'sample_trace_id', '1', 'sample order desc', 'http://beecloud.cn')
+        print data
+        self.write(data['html']) 
+def main():
+    tornado.options.parse_command_line()
+    application = tornado.web.Application([
+        (r"/unweb/demo/", MainHandler),
+    ])
+    http_server = tornado.httpserver.HTTPServer(application)
+    http_server.listen(options.port)
+    tornado.ioloop.IOLoop.instance().start()
+if __name__ == "__main__":
+    main()
+```
+
+
 ##运行demo
 需要安装`beecloud`和`tornado`  
 进入example文件夹，Python执行demo文件即可，每个demo文件是一个功能，端口号定义在demo中

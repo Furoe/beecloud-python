@@ -24,6 +24,7 @@ class BCApi(object):
     wx_native_type = 'NATIVE'#微信二维码扫码支付
     ali_web_url = 'pay/ali/websign'
     ali_qr_url = 'pay/ali/qrsign'
+    un_web_url = 'pay/un/websign'
     def __init__(self):
         if not self.bc_app_id or not self.bc_app_secret or not self.wx_app_id or not self.wx_app_secret:
             print 'beecloud或微信参数没有正确设置，请注意'
@@ -115,6 +116,25 @@ class BCApi(object):
         #hCode, value = httpGet('http://localhost:8080/1/pay/ali/qrsign?' + urllib.urlencode(data))
         if hCode:
             return json.loads(value) 
+        return None
+
+    # 银联网页支付
+    def bc_un_web_pay(self, orderId, traceId, txnAmt, orderDesc, frontUrl):
+        awp = {}
+        awp['appId'] = self.bc_app_id
+        awp['appSign'] = self.bc_sign()       
+        awp['orderId'] = orderId
+        awp['traceId'] = traceId
+        awp['txnAmt'] = txnAmt
+        awp['orderDesc'] = orderDesc
+        awp['frontUrl'] = frontUrl
+        data={}
+        data['para'] = awp
+        hCode, value = httpGet('https://' + self.bc_servers[self.server_index] + '/' +
+                self.api_version + '/' + self.un_web_url + '?'+ urllib.urlencode(data))
+        #hCode, value = httpGet('http://localhost:8080/1/pay/un/websign?' + urllib.urlencode(data))
+        if hCode:
+            return json.loads(value)
         return None
 
     # 获取微信用户的openid，需要微信用户先登录，获得code
