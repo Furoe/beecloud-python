@@ -1,3 +1,4 @@
 /dist/*
 /build/*
 beecloud.egg-info/*
+*.swp
