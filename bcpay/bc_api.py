@@ -26,6 +26,7 @@ class BCApi(object):
     ali_qr_url = 'pay/ali/qrsign'
     un_web_url = 'pay/un/websign'
     wx_red_url = 'pay/wxmp/redPack'
+    wx_red_extra_url = 'pay/wxmp/redPackExtra'
     def __init__(self):
         if not self.bc_app_id or not self.bc_app_secret or not self.wx_app_id or not self.wx_app_secret:
             print 'beecloud或微信参数没有正确设置，请注意'
@@ -89,13 +90,47 @@ class BCApi(object):
         params = json.dumps(pp_data)
         data = {}
         data['para'] = params
-        hCode, value = httpGet('https://' + self.bc_servers[self.server_index] + '/' + self.api_version + '/' + self.wx_red_url+ '?'+ urllib.urlencode(data))
+        hCode, value = httpGet('https://' + self.bc_servers[self.server_index] + '/' + self.api_version + '/' + self.wx_red_url + '?'+ urllib.urlencode(data))
         #hCode, value = httpGet('http://127.0.0.1:8080/1/pay/wxmp/redPack?' + urllib.urlencode(data))
         if hCode :
             return json.loads(value)
         return None
-    
-    #支付宝网页支付
+
+    #微信红包支付
+    def bc_red_pack_extra(self, mch_billno, re_openid, nick_name, send_name, wishing, act_name, remark, total_amount=None,
+                       countPerUser=None, minA=None, maxA=None, probability=None, period=None):
+        pp_data = {}
+        pp_data['appId'] = self.bc_app_id
+        pp_data['appSign'] = self.bc_sign()
+        pp_data['mch_billno'] = mch_billno
+        pp_data['re_openid'] = re_openid
+        if total_amount:
+            pp_data['total_amount'] = total_amount
+        pp_data['nick_name'] = nick_name
+        pp_data['send_name'] = send_name
+        pp_data['wishing'] = wishing
+        pp_data['remark'] = remark
+        pp_data['act_name'] = act_name
+        if countPerUser:
+            pp_data['count_per_user'] = countPerUser
+        if minA:
+            pp_data['min'] = minA
+        if maxA:
+            pp_data['max'] = maxA
+        if probability:
+            pp_data['probability'] = probability
+        if period:
+            pp_data['period'] = period
+        params = json.dumps(pp_data)
+        data = {}
+        data['para'] = params
+        hCode, value = httpGet('https://' + self.bc_servers[self.server_index] + '/' + self.api_version + '/' + self.wx_red_extra_url+ '?'+ urllib.urlencode(data))
+        #hCode, value = httpGet('http://127.0.0.1:8080/1/pay/wxmp/redPackExtra?' + urllib.urlencode(data))
+        if hCode :
+            return json.loads(value)
+        return None
+ 
+    #支付宝
     def bc_ali_web_pay(self, subject, total_fee, out_trade_no, return_url, show_url = None,
         anti_phishing_key = None, body = None):
         awp = {}
@@ -113,9 +148,7 @@ class BCApi(object):
             awp['body'] = body
         data = {}
         data['para'] = json.dumps(awp)
-
-        hCode, value = httpGet('https://' + self.bc_servers[self.server_index] + '/' +
-                self.api_version + '/' + self.ali_web_url + '?'+ urllib.urlencode(data)) 
+        hCode, value = httpGet('https://' + self.bc_servers[self.server_index] + '/' + self.api_version + '/' + self.ali_web_url + '?'+ urllib.urlencode(data)) 
         #hCode, value = httpGet('http://localhost:8080/1/pay/ali/websign?' + urllib.urlencode(data))
         if hCode:
             return json.loads(value)

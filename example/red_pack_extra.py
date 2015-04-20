@@ -21,10 +21,10 @@ class MainHandler(tornado.web.RequestHandler):
         #no格式: 十位数字每天不重复
         no = self.get_argument('no')
         #mch_billno格式：mch_id + 时间(yyyymmdd) + 十位不重复数字
-        data = api.bc_red_pack(mch_id + date + no, 'o3kKrjmoHicB9nnAK7pcSUBBhXv8', 101, 'nick', 'nick', '中文', 'act', 'remark')
+        data = api.bc_red_pack_extra(mch_id + date + no, 'o3kKrjmoHicB9nnAK7pcSUBBhXv8', 'nick', 'nick', '中文', 'act', 'remark', countPerUser=6, minA=200, maxA=400, probability=0.9)
+        #data = api.bc_red_pack(mch_id + date + no, 'o3kKrjghF2_G9TceZQrOizJTZtqY', 100, 'nick', 'nick', '中文', 'act', 'remark')
         print data
         self.write(data)
-        self.write(data['return_msg'])
 def main():
     tornado.options.parse_command_line()
     application = tornado.web.Application([

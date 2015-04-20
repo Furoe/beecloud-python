@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'beecloud',
-    version = '1.2.3',
+    version = '1.2.4',
       
     keywords = ('beecloud', 'pay'),
     description = 'beecloud, make pay more simple',
