@@ -1,6 +1,7 @@
 import urllib2
 import ssl
 import json
+import httplib, urllib
 def httpGet(url):
     try:
         gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
@@ -16,13 +17,17 @@ def httpGet(url):
             return False, None
 
 def httpPost(url, data):
-    try:
-        req = urllib2.Request(url=url, data=data)
-        res_data = urllib2.urlopen(req)
-        res = res_data.read()
-        return json.loads(res) 
-    except:
-        r = {}
-        r['result_code'] = 14
-        r['result_msg'] = 'RUN_TIME_ERROR'
-        return r
+        if isinstance(data, dict):
+            data = json.dumps(data)
+        print data
+        headers = {'Content-Type':'application/json', 'Accept':'application/json'}
+        request = urllib2.Request(url = url, data = data, headers = headers)
+        print request
+        try:
+            response = urllib2.urlopen(request)
+            resp = response.read()
+            print resp
+            return json.loads(resp)
+        except Exception, e:
+            print e
+            return {"resultCode":512, "errMsg":"SERVER_OR_NETWORK_ERR"}

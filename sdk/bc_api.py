@@ -6,8 +6,10 @@ from util import httpGet, httpPost
 import random
 import re
 from datetime import datetime
+import time
 class BCApi(object):
     bc_servers = ['https://apibj.beecloud.cn', 'https://apisz.beecloud.cn', 'https://apiqd.beecloud.cn', 'https://apihz.beecloud.cn', 'https://api.beecloud.cn']
+    bc_servers = ['http://localhost:8080']
     #api version
     api_version = '1'
 
@@ -40,10 +42,10 @@ class BCApi(object):
 
     def bc_sign(self, timestamp):
         #return self.m.update(self.appid+self.appsecret)
-        return hashlib.md5(self.bc_app_id + self.bc_app_secret + str(timestamp)).hexdigest()
+        return hashlib.md5(self.bc_app_id + str(timestamp) + self.bc_app_secret ).hexdigest()
 
-    def random_server():
-        return self.bc_servers[random.randint(0, len(self.bc_servers))];
+    def random_server(self):
+        return self.bc_servers[random.randint(0, len(self.bc_servers) - 1)];
 
     def param_miss(param):
         err_data = {}
@@ -64,7 +66,7 @@ class BCApi(object):
         r['result_msg'] = 'RUN_TIME_ERROR'
         return r
 
-    def pay(channel, total_fee, bill_no, title, return_url = None, optional = None, show_url = None,
+    def pay(self, channel, total_fee, bill_no, title, return_url = None, optional = None, show_url = None,
             qr_pay_mode = None, openid = None):
         pay_data = {}
 
@@ -80,11 +82,11 @@ class BCApi(object):
         if not bill_no:
             return param_miss('bill_no')
 
-        if channel == 'WX_JSAPI' && !openid:
+        if channel == 'WX_JSAPI' and not openid:
             return param_miss('openid')
 
-        if not channel in pay_channels:
-            return param_invalid('channel', '应该在' + str(pay_channels) + '中')
+        if not channel in self.pay_channels:
+            return param_invalid('channel', '应该在' + str(self.pay_channels) + '中')
 
         if not isinstance(total_fee, int) or total_fee < 0:
             return param_invalid('total_fee', 'total_fee以分为单位，为正整数')
@@ -99,9 +101,8 @@ class BCApi(object):
             return param_invalid('bill_no', '只能字母数字组合')
         
         pay_data['channel'] = channel        
-        pay_data['bc_app_id'] = self.bc_app_id
-        timestamp = datetime.utcnow()
-        timestamp = long(timestamp) * 1000
+        pay_data['app_id'] = self.bc_app_id
+        timestamp = long(time.time()) * 1000
         pay_data['timestamp'] = timestamp
         pay_data['app_sign'] = self.bc_sign(timestamp)
 
@@ -124,9 +125,9 @@ class BCApi(object):
         if channel == 'ALI_QRCODE' and qr_pay_mode:
             pay_data['qr_pay_mode'] = qr_pay_mode
 
-        return httpPost(random_server + '/' + self.version + '/' + pay_url, urllib.urlencode(pay_data))
+        return httpPost(self.random_server() + '/' + self.api_version + '/' + self.pay_url, pay_data)
 
-    def refund(channel, refund_fee, refund_no, bill_no, optional = None):
+    def refund(self, channel, refund_fee, refund_no, bill_no, optional = None):
         pay_data = {}
 
         if not self.bc_app_id or not self.bc_app_secret :
@@ -141,8 +142,8 @@ class BCApi(object):
         if not refund_no:
             return param_miss('refund_no')
 
-        if not channel in refund_channels:
-            return param_invalid('channel', '应该在' + str(refund_channels) + '中')
+        if not channel in self.refund_channels:
+            return param_invalid('channel', '应该在' + str(self.refund_channels) + '中')
 
         if not isinstance(refund_fee, int) or refund_fee < 0:
             return param_invalid('refund_fee', 'refund_fee以分为单位，为正整数')
@@ -160,9 +161,8 @@ class BCApi(object):
         
         pay_data = {}
         pay_data['channel'] = channel
-        pay_data['bc_app_id'] = self.bc_app_id
-        timestamp = datetime.utcnow()
-        timestamp = long(timestamp) * 1000
+        pay_data['app_id'] = self.bc_app_id
+        timestamp = long(time.time()) * 1000
         pay_data['timestamp'] = timestamp
         pay_data['app_sign'] = self.bc_sign(timestamp)
 
@@ -174,126 +174,123 @@ class BCApi(object):
         if optional: 
             pay_data['optional'] = optional
 
-        return httpPost(random_server + '/' + self.version + '/' + refund_url, urllib.urlencode(pay_data))
+        return httpPost(self.random_server() + '/' + self.api_version + '/' + self.refund_url, pay_data)
 
     def query_bill(self, channel, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
-         if not self.bc_app_id or not self.bc_app_secret :
+         if not self.bc_app_id or not self.bc_app_secret:
             return param_miss('bc_app_id, bc_app_secret')
         
-        if not channel:
+         if not channel:
             return param_miss('channel')
 
-        if not channel in query_channels:
+         if not channel in query_channels:
             return param_invalid('channel', '应该在' + str(query_channels) + '中')
 
-        pay_data = {}
-        pay_data['channel'] = channel
-        pay_data['bc_app_id'] = self.bc_app_id
-        timestamp = datetime.utcnow()
-        timestamp = long(timestamp) * 1000
-        pay_data['timestamp'] = timestamp
-        pay_data['app_sign'] = self.bc_sign(timestamp)
+         pay_data = {}
+         pay_data['channel'] = channel
+         pay_data['app_id'] = self.bc_app_id
+         timestamp = long(time.time()) * 1000
+         pay_data['timestamp'] = timestamp
+         pay_data['app_sign'] = self.bc_sign(timestamp)
 
-        if bill_no:
+         if bill_no:
             pay_data['bill_no'] = bill_no
 
-        if start_time:
+         if start_time:
             pay_data['start_time'] = start_time
 
-        if end_time:
+         if end_time:
             pay_data['end_time'] = end_time
 
-        if not skip:
+         if not skip:
             skip = 0
 
-        if not limit:
+         if not limit:
             limit = 10
 
-        pay_data['skip'] = skip
-        pay_data['limit'] = limit 
+         pay_data['skip'] = skip
+         pay_data['limit'] = limit 
 
-        data = {}
-        data['para'] = pay_data
-        hCode, value = httpGet(random_server() + '/' + self.api_version + '/' + self.pay_query_url+ '?'+ urllib.urlencode(data))
-        if hCode:
+         data = {}
+         data['para'] = pay_data
+         hCode, value = httpGet(self.random_server() + '/' + self.api_version + '/' + self.pay_query_url+ '?'+ urllib.urlencode(data))
+         if hCode:
             return json.loads(value)
-        else:
+         else:
             return runtime_error()
 
-   def query_refund(self, channel, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
+    def query_refund(self, channel, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret :
             return param_miss('bc_app_id, bc_app_secret')
         
-        if not channel:
+         if not channel:
             return param_miss('channel')
 
-        if not channel in query_channels:
+         if not channel in query_channels:
             return param_invalid('channel', '应该在' + str(query_channels) + '中')
 
-        pay_data = {}
-        pay_data['channel'] = channel
-        pay_data['bc_app_id'] = self.bc_app_id
-        timestamp = datetime.utcnow()
-        timestamp = long(timestamp) * 1000
-        pay_data['timestamp'] = timestamp
-        pay_data['app_sign'] = self.bc_sign(timestamp)
+         pay_data = {}
+         pay_data['channel'] = channel
+         pay_data['app_id'] = self.bc_app_id
+         timestamp = long(time.time()) * 1000
+         pay_data['timestamp'] = timestamp
+         pay_data['app_sign'] = self.bc_sign(timestamp)
 
-        if refund_no:
+         if refund_no:
             pay_data['refund_no'] = refund_no
 
-        if bill_no:
+         if bill_no:
             pay_data['bill_no'] = bill_no
 
-        if start_time:
+         if start_time:
             pay_data['start_time'] = start_time
 
-        if end_time:
+         if end_time:
             pay_data['end_time'] = end_time
 
-        if not skip:
+         if not skip:
             skip = 0
 
-        if not limit:
+         if not limit:
             limit = 10
 
-        pay_data['skip'] = skip
-        pay_data['limit'] = limit 
+         pay_data['skip'] = skip
+         pay_data['limit'] = limit 
 
-        data = {}
-        data['para'] = pay_data
-        hCode, value = httpGet(random_server() + '/' + self.api_version + '/' + self.refund_query_url+ '?'+ urllib.urlencode(data))
-        if hCode:
+         data = {}
+         data['para'] = pay_data
+         hCode, value = httpGet(self.random_server() + '/' + self.api_version + '/' + self.refund_query_url+ '?'+ urllib.urlencode(data))
+         if hCode:
             return json.loads(value)
-        else:
+         else:
             return runtime_error()
 
     def refund_status(self, channel, refund_no = None):
          if not self.bc_app_id or not self.bc_app_secret :
             return param_miss('bc_app_id, bc_app_secret')
         
-        if not channel:
+         if not channel:
             return param_miss('channel')
 
-        if not channel == 'WX':
+         if not channel == 'WX':
             return param_invalid('channel', '目前本接口只支持WX')
 
-        pay_data = {}
-        pay_data['channel'] = channel
-        pay_data['bc_app_id'] = self.bc_app_id
-        timestamp = datetime.utcnow()
-        timestamp = long(timestamp) * 1000
-        pay_data['timestamp'] = timestamp
-        pay_data['app_sign'] = self.bc_sign(timestamp)
+         pay_data = {}
+         pay_data['channel'] = channel
+         pay_data['app_id'] = self.bc_app_id
+         timestamp = long(time.time()) * 1000
+         pay_data['timestamp'] = timestamp
+         pay_data['app_sign'] = self.bc_sign(timestamp)
 
-        if refund_no:
+         if refund_no:
             pay_data['refund_no'] = refund_no
 
-        data = {}
-        data['para'] = pay_data
-        hCode, value = httpGet(random_server() + '/' + self.api_version + '/' + self.refund_status_url+ '?'+ urllib.urlencode(data))
-        if hCode:
+         data = {}
+         data['para'] = pay_data
+         hCode, value = httpGet(self.random_server() + '/' + self.api_version + '/' + self.refund_status_url+ '?'+ urllib.urlencode(data))
+         if hCode:
             return json.loads(value)
-        else:
+         else:
             return runtime_error()
 
 

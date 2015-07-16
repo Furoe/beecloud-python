@@ -8,7 +8,7 @@ import hashlib
 
 from tornado.options import define, options
 
-define("port", default=8088, help="run on the given port", type=int)
+define("port", default=8090, help="run on the given port", type=int)
 class MainHandler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body)
@@ -20,6 +20,10 @@ class MainHandler(tornado.web.RequestHandler):
         if thissign == sign:
             self.write('success')
             #处理业务逻辑
+            channel_type = data['channelType']
+            transaction_type = data['transactionType']
+            trade_success = data['tradeSuccess']
+            message_detail = data['messageDetail']
         else:
             self.write('any this except success')
 
