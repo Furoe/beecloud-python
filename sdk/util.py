@@ -3,6 +3,7 @@ import ssl
 import json
 import httplib, urllib
 def httpGet(url):
+    print url
     try:
         gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
         f = urllib2.urlopen(url, context = gcontext)
@@ -19,14 +20,11 @@ def httpGet(url):
 def httpPost(url, data):
         if isinstance(data, dict):
             data = json.dumps(data)
-        print data
         headers = {'Content-Type':'application/json', 'Accept':'application/json'}
         request = urllib2.Request(url = url, data = data, headers = headers)
-        print request
         try:
             response = urllib2.urlopen(request)
             resp = response.read()
-            print resp
             return json.loads(resp)
         except Exception, e:
             print e

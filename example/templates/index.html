@@ -107,7 +107,11 @@ input {
 
 <body>
 	<div>
+
 		<h2>商品名：在线支付Demo</h2>
+		<h2><a href = '/bills?channel=WX' target = '_blank'> 点击查看微信订单列表</a></h2>
+		<h2><a href = '/bills?channel=ALI' target = '_blank'> 点击查看支付宝订单列表</a></h2>
+		<h2><a href = '/bills?channel=UN' target = '_blank'> 点击查看银联订单列表</a></h2>
 		<h4>应付总额： ¥0.01</h4>
 		<p>请选择支付方式：</p>
 	</div>
@@ -140,6 +144,7 @@ input {
 		-------------------------------或者你可以使用duangduangduang的秒支付button，一键支付，不用导入任何SDK！-----------------------------------------------
 	</div>
 	<button id="spaybutton" class="button">秒支付 一键支付</button>
+
 </body>
 <script type="text/javascript">
 	function paySwitch(that) {

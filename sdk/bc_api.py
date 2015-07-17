@@ -9,7 +9,7 @@ from datetime import datetime
 import time
 class BCApi(object):
     bc_servers = ['https://apibj.beecloud.cn', 'https://apisz.beecloud.cn', 'https://apiqd.beecloud.cn', 'https://apihz.beecloud.cn', 'https://api.beecloud.cn']
-    bc_servers = ['http://localhost:8080']
+    bc_servers = ['http://58.211.191.123:8080']
     #api version
     api_version = '1'
 
@@ -47,20 +47,21 @@ class BCApi(object):
     def random_server(self):
         return self.bc_servers[random.randint(0, len(self.bc_servers) - 1)];
 
-    def param_miss(param):
+    def param_miss(self, param):
         err_data = {}
         err_data['result_code'] = 4
         err_data['result_msg'] = 'MISS_PARAM'
         err_data['err_detail'] = str(param) + '是必填参数'
         return err_data
 
-    def param_invalid(param, err_detail):
+    def param_invalid(self, param, err_detail):
         err_data = {}
         err_data['result_code'] = 5
         err_data['result_msg'] = 'PARAM_INVALID'
         err_data['err_detail'] = str(param) + '不合法 ' + str(err_detail)
+        return err_data
 
-    def runtime_error():
+    def runtime_error(self):
         r = {}
         r['result_code'] = 14
         r['result_msg'] = 'RUN_TIME_ERROR'
@@ -71,34 +72,34 @@ class BCApi(object):
         pay_data = {}
 
         if not self.bc_app_id or not self.bc_app_secret :
-            return param_miss('bc_app_id, bc_app_secret')
+            return self.param_miss('bc_app_id, bc_app_secret')
         
         if not channel:
-            return param_miss('channel')
+            return self.param_miss('channel')
 
         if not total_fee:
-            return param_miss('total_fee')
+            return self.param_miss('total_fee')
 
         if not bill_no:
-            return param_miss('bill_no')
+            return self.param_miss('bill_no')
 
         if channel == 'WX_JSAPI' and not openid:
-            return param_miss('openid')
+            return self.param_miss('openid')
 
         if not channel in self.pay_channels:
-            return param_invalid('channel', '应该在' + str(self.pay_channels) + '中')
+            return self.param_invalid('channel', '应该在' + str(self.pay_channels) + '中')
 
         if not isinstance(total_fee, int) or total_fee < 0:
-            return param_invalid('total_fee', 'total_fee以分为单位，为正整数')
+            return self.param_invalid('total_fee', 'total_fee以分为单位，为正整数')
 
         if len(title) > 32:
-            return param_invalid('title', '32个字节内')
+            return self.param_invalid('title', '32个字节内')
 
         if len(bill_no) > 32:
-            return param_invalid('bill_no', '32个字节内')
+            return self.param_invalid('bill_no', '32个字节内')
 
         if not re.match('^[0-9a-zA-Z]+$', bill_no):
-            return param_invalid('bill_no', '只能字母数字组合')
+            return self.param_invalid('bill_no', '只能字母数字组合')
         
         pay_data['channel'] = channel        
         pay_data['app_id'] = self.bc_app_id
@@ -131,33 +132,38 @@ class BCApi(object):
         pay_data = {}
 
         if not self.bc_app_id or not self.bc_app_secret :
-            return param_miss('bc_app_id, bc_app_secret')
+            return self.param_miss('bc_app_id, bc_app_secret')
         
         if not channel:
-            return param_miss('channel')
+            return self.param_miss('channel')
 
         if not refund_fee:
-            return param_miss('refund_fee')
+            return self.param_miss('refund_fee')
 
         if not refund_no:
-            return param_miss('refund_no')
+            return self.param_miss('refund_no')
 
         if not channel in self.refund_channels:
-            return param_invalid('channel', '应该在' + str(self.refund_channels) + '中')
+            return self.param_invalid('channel', '应该在' + str(self.refund_channels) + '中')
 
-        if not isinstance(refund_fee, int) or refund_fee < 0:
-            return param_invalid('refund_fee', 'refund_fee以分为单位，为正整数')
+        if int(refund_fee) < 0:
+            return self.param_invalid('refund_fee', 'refund_fee以分为单位，为正整数')
 
-        now = datetime.datetime.now()
+        now = datetime.now()
         date = now.strftime("%Y%m%d")
+        print refund_no
+        print str(date)
+        print len(refund_no)
+        print refund_no.startswith(str(date))
+        print re.match('^[0-9a-zA-Z]+$', refund_no)
         if len(refund_no) > 32 or not refund_no.startswith(str(date)) or not re.match('^[0-9a-zA-Z]+$', refund_no):
-            return param_invalid('refund_no', '32个字节内, 8位日期开头加24为流水号, 流水号字母数字组合，流水号不能为000')
+            return self.param_invalid('refund_no', '32个字节内, 8位日期开头加24为流水号, 流水号字母数字组合，流水号不能为000')
 
         if len(bill_no) > 32:
-            return param_invalid('bill_no', '32个字节内')
+            return self.param_invalid('bill_no', '32个字节内')
 
         if not re.match('^[0-9a-zA-Z]+$', bill_no):
-            return param_invalid('bill_no', '只能字母数字组合')
+            return self.param_invalid('bill_no', '只能字母数字组合')
         
         pay_data = {}
         pay_data['channel'] = channel
@@ -166,8 +172,8 @@ class BCApi(object):
         pay_data['timestamp'] = timestamp
         pay_data['app_sign'] = self.bc_sign(timestamp)
 
-        pay_data['refund_fee'] = refund_fee
-        pay_data['refudn_no'] = refudn_no
+        pay_data['refund_fee'] = int(refund_fee)
+        pay_data['refund_no'] = refund_no
         pay_data['bill_no'] = bill_no
         
 
@@ -178,13 +184,13 @@ class BCApi(object):
 
     def query_bill(self, channel, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret:
-            return param_miss('bc_app_id, bc_app_secret')
+            return self.param_miss('bc_app_id, bc_app_secret')
         
          if not channel:
-            return param_miss('channel')
+            return self.param_miss('channel')
 
-         if not channel in query_channels:
-            return param_invalid('channel', '应该在' + str(query_channels) + '中')
+         if not channel in self.query_channels:
+            return self.param_invalid('channel', '应该在' + str(self.query_channels) + '中')
 
          pay_data = {}
          pay_data['channel'] = channel
@@ -214,20 +220,21 @@ class BCApi(object):
          data = {}
          data['para'] = pay_data
          hCode, value = httpGet(self.random_server() + '/' + self.api_version + '/' + self.pay_query_url+ '?'+ urllib.urlencode(data))
+         print hCode, value
          if hCode:
             return json.loads(value)
          else:
-            return runtime_error()
+            return self.runtime_error()
 
     def query_refund(self, channel, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret :
-            return param_miss('bc_app_id, bc_app_secret')
+            return self.param_miss('bc_app_id, bc_app_secret')
         
          if not channel:
-            return param_miss('channel')
+            return self.param_miss('channel')
 
          if not channel in query_channels:
-            return param_invalid('channel', '应该在' + str(query_channels) + '中')
+            return self.param_invalid('channel', '应该在' + str(query_channels) + '中')
 
          pay_data = {}
          pay_data['channel'] = channel
@@ -267,13 +274,13 @@ class BCApi(object):
 
     def refund_status(self, channel, refund_no = None):
          if not self.bc_app_id or not self.bc_app_secret :
-            return param_miss('bc_app_id, bc_app_secret')
+            return self.param_miss('bc_app_id, bc_app_secret')
         
          if not channel:
-            return param_miss('channel')
+            return self.param_miss('channel')
 
          if not channel == 'WX':
-            return param_invalid('channel', '目前本接口只支持WX')
+            return self.param_invalid('channel', '目前本接口只支持WX')
 
          pay_data = {}
          pay_data['channel'] = channel

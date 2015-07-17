@@ -7,7 +7,9 @@ import tornado.web
 import uuid
 import os
 import md5
+import time
 
+from datetime import datetime
 from tornado.options import define, options
 from sdk.bc_api import BCApi
 
@@ -51,6 +53,34 @@ class ResultHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render('templates/result.html')
 
+class BillHandler(tornado.web.RequestHandler):
+	def get(self):
+	       channel = self.get_argument('channel')
+	       if not channel:
+	       	channel = 'WX'
+	       data = api.query_bill(str(channel))
+	       print data
+	       bills = data['bills']
+	       self.render('templates/bills.html', bills = bills, channel = channel)
+
+class RefundHandler(tornado.web.RequestHandler):
+	def get(self):
+	       channel = self.get_argument('channel')
+	       if not channel:
+	       	channel = 'WX'
+
+	       bill_no = self.get_argument("bill_no")
+	       refund_fee = self.get_argument("refund_fee")
+	       now = datetime.now()
+	       date = now.strftime("%Y%m%d")
+	       refund_no = str(date) + str(uuid.uuid1()).replace('-','')[0:23]
+	       print refund_no
+	       print bill_no
+	       data = api.refund(channel, refund_fee, refund_no, bill_no)
+	       print data
+	       self.render('templates/refund_result.html', data = data)
+
+
 def main():
 	settings = {"static_path": os.path.join(os.path.dirname(__file__), "static")}
 	tornado.options.parse_command_line()
@@ -58,6 +88,8 @@ def main():
 		(r"/", IndexHandler),
 		(r"/pay", PayHandler),
 		(r"/result",ResultHandler),
+		(r"/bills", BillHandler),
+		(r"/refund", RefundHandler),
 	],**settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(options.port)
