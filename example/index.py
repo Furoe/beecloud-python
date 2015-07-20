@@ -19,6 +19,7 @@ BCApi.bc_app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
 BCApi.wx_app_id = 'wx419f04c4a731303d'
 BCApi.wx_app_secret = '21e4b4593ddd200dd77c751f4b964963'
 api = BCApi()
+home = 'http://ask.beecloud.cn'
 
 class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -40,8 +41,11 @@ class PayHandler(tornado.web.RequestHandler):
 			if pay_type == 'wechatQr':
 			    data = api.pay('WX_NATIVE', 1, str(uuid.uuid1()).replace('-',''), '在线白开水')
 			    self.render('templates/nativeapi_demo.html', data=data['code_url'])
+			if pay_type == 'jsapi':
+			    self.redirect('/jsapi/demo')
 			if pay_type == 'unionpay':
 			    data = api.pay('UN_WEB', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result')
+			    print data
 			    self.write(data['html'])
 			if pay_type == 'qralipay':
 			    temp = api.pay('ALI_WEB', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result', qr_pay_mode = '0')
@@ -53,6 +57,25 @@ class ResultHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render('templates/result.html')
 
+class JSApiHandler(tornado.web.RequestHandler):
+	def get(self):
+		try:
+			code = self.get_argument("code")
+			print code
+			status, openid = api.fetch_open_id(code)
+			data = api.pay('WX_JSAPI', 1, str(uuid.uuid1()).replace('-',''), 'jsapi demo', openid = openid)
+			jsapi = {}
+			jsapi['timeStamp'] = data['timestamp']
+			jsapi['appId'] = data['app_id']
+			jsapi['nonceStr'] = data['nonce_str']
+			jsapi['package'] = data['package']
+			jsapi['signType'] = data['sign_type']
+			jsapi['paySign'] = data['pay_sign']
+			self.render('templates/jsapi_demo.html', jsapi=json.dumps(jsapi))
+		except:
+			url = api.fetch_code(home + 'jsapi/demo')
+			self.redirect(url)
+
 class BillHandler(tornado.web.RequestHandler):
 	def get(self):
 	       channel = self.get_argument('channel')
@@ -62,6 +85,26 @@ class BillHandler(tornado.web.RequestHandler):
 	       print data
 	       bills = data['bills']
 	       self.render('templates/bills.html', bills = bills, channel = channel)
+
+class RefundsHandler(tornado.web.RequestHandler):
+	def get(self):
+	       channel = self.get_argument('channel')
+	       if not channel:
+	       	channel = 'WX'
+	       data = api.query_refund(str(channel))
+	       print data
+	       refunds = data['refunds']
+	       self.render('templates/refunds.html', refunds = refunds, channel = channel)
+
+class RefundStatusHandler(tornado.web.RequestHandler):
+	def get(self):
+	       channel = self.get_argument('channel')
+	       if not channel:
+	       	channel = 'WX'
+	       refund_no = self.get_argument('refund_no')
+	       data = api.refund_status(str(channel), str(refund_no))
+	       self.write(data)
+
 
 class RefundHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -81,6 +124,7 @@ class RefundHandler(tornado.web.RequestHandler):
 	       self.render('templates/refund_result.html', data = data)
 
 
+
 def main():
 	settings = {"static_path": os.path.join(os.path.dirname(__file__), "static")}
 	tornado.options.parse_command_line()
@@ -90,6 +134,9 @@ def main():
 		(r"/result",ResultHandler),
 		(r"/bills", BillHandler),
 		(r"/refund", RefundHandler),
+        		(r"/refunds", RefundsHandler),
+        		(r"/refund_status", RefundStatusHandler),
+        		(r"/jsapi/demo", JSApiHandler),
 	],**settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(options.port)

@@ -109,9 +109,9 @@ input {
 	<div>
 
 		<h2>商品名：在线支付Demo</h2>
-		<h2><a href = '/bills?channel=WX' target = '_blank'> 点击查看微信订单列表</a></h2>
-		<h2><a href = '/bills?channel=ALI' target = '_blank'> 点击查看支付宝订单列表</a></h2>
-		<h2><a href = '/bills?channel=UN' target = '_blank'> 点击查看银联订单列表</a></h2>
+		<h2><a href = '/bills?channel=WX' target = '_blank'> 点击查看微信订单列表</a>  <a href = '/refunds?channel=WX' target = '_blank'> 点击查看微信退款列表</a></h2>
+		<h2><a href = '/bills?channel=ALI' target = '_blank'> 点击查看支付宝订单列表</a>  <a href = '/refunds?channel=ALI' target = '_blank'> 点击查看支付宝退款列表</a></h2>
+		<h2><a href = '/bills?channel=UN' target = '_blank'> 点击查看银联订单列表</a>  <a href = '/refunds?channel=UN' target = '_blank'> 点击查看银联退款列表</a></h2>
 		<h4>应付总额： ¥0.01</h4>
 		<p>请选择支付方式：</p>
 	</div>
@@ -122,6 +122,10 @@ input {
 			   		<input type="radio"  value="alipay" name="paytype" checked="checked">
 			    	<img src="http://beeclouddoc.qiniudn.com/ali.png" alt="">
 		        </li>
+				<li onclick="paySwitch(this)">
+					<input type="radio"  value="jsapi" name="paytype">
+					<img src="http://beeclouddoc.qiniudn.com/wechats.png" alt="">
+				</li>
 				<li onclick="paySwitch(this)">
 					<input type="radio"  value="wechatQr" name="paytype">
 					<img src="http://beeclouddoc.qiniudn.com/wechats.png" alt="">

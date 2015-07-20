@@ -1,0 +1,41 @@
+<CTYPE html>
+<html class="ui-mobile"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>订单列表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/resource/iconfont/iconfont.css"/>
+    <script type="text/javascript" src="/lib/js/jquery-1.11.1.min.js"></script>
+</head>
+
+<body style="padding:0;margin: 0;">
+<table width=”450″ border="1" cellspacing="0" cellpadding="2" bordercolor="#009900">
+    <tr>
+        <td>订单号</td>
+        <td>退款单号</td>
+        <td>订单金额</td>
+        <td>退款金额</td>
+        <td>是否退款成功</td>
+        <td>退款是否结束</td>
+        {% if channel == 'WX' %}
+        <td>操作</td>
+        {% end %}
+    </tr>
+
+    {% for refund in refunds %}
+    <tr>
+     <td>{{refund['bill_no']}}</td>  <td>{{refund['refund_no']}}</td> <td>{{refund['total_fee']}}</td>  <td>{{refund['refund_fee']}}</td>  <td>{{refund['result']}}</td>
+      <td>{{refund['finish']}}</td>
+      {% if channel == 'WX' %}
+     <td> {% if not refund['finish'] %}<a href = "/refund_status?channel={{channel}}&refund_no={{refund['refund_no']}} " target='_blank'> 更新退款状态
+     </a> {% end %}</td>{% end %}
+ </tr>
+    {% end %}
+</table>
+</body>
+
+<script>
+    
+</script>
+</html>
+
