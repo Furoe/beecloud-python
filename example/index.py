@@ -59,12 +59,14 @@ class ResultHandler(tornado.web.RequestHandler):
 
 class JSApiHandler(tornado.web.RequestHandler):
 	def get(self):
+		code = ''
 		try:
 			code = self.get_argument("code")
 		except Exception, e:
 			print e
                         url = api.fetch_code(home + 'jsapi/demo/online_demo.php')
                         self.redirect(url)
+			return None
 		status, openid = api.fetch_open_id(code)
 		data = api.pay('WX_JSAPI', 1, str(uuid.uuid1()).replace('-',''), 'jsapi demo', openid = openid)
 		jsapi = {}
