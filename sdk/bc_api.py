@@ -367,7 +367,7 @@ class BCApi(object):
         url = self.create_fetch_open_id_url(code)
         hCode, hValue = httpGet(url)
         if hCode :
-            return True, hValue
+            return True, json.loads(hValue)['openid'] 
         else:
             return False, None
 

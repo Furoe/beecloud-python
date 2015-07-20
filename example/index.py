@@ -13,13 +13,13 @@ from datetime import datetime
 from tornado.options import define, options
 from sdk.bc_api import BCApi
 
-define("port", default=8088, help="run on the given port", type=int)
+define("port", default=80, help="run on the given port", type=int)
 BCApi.bc_app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
 BCApi.bc_app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
 BCApi.wx_app_id = 'wx419f04c4a731303d'
 BCApi.wx_app_secret = '21e4b4593ddd200dd77c751f4b964963'
 api = BCApi()
-home = 'http://ask.beecloud.cn'
+home = 'http://queue.beecloud.cn/'
 
 class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -61,20 +61,20 @@ class JSApiHandler(tornado.web.RequestHandler):
 	def get(self):
 		try:
 			code = self.get_argument("code")
-			print code
-			status, openid = api.fetch_open_id(code)
-			data = api.pay('WX_JSAPI', 1, str(uuid.uuid1()).replace('-',''), 'jsapi demo', openid = openid)
-			jsapi = {}
-			jsapi['timeStamp'] = data['timestamp']
-			jsapi['appId'] = data['app_id']
-			jsapi['nonceStr'] = data['nonce_str']
-			jsapi['package'] = data['package']
-			jsapi['signType'] = data['sign_type']
-			jsapi['paySign'] = data['pay_sign']
-			self.render('templates/jsapi_demo.html', jsapi=json.dumps(jsapi))
-		except:
-			url = api.fetch_code(home + 'jsapi/demo')
-			self.redirect(url)
+		except Exception, e:
+			print e
+                        url = api.fetch_code(home + 'jsapi/demo/online_demo.php')
+                        self.redirect(url)
+		status, openid = api.fetch_open_id(code)
+		data = api.pay('WX_JSAPI', 1, str(uuid.uuid1()).replace('-',''), 'jsapi demo', openid = openid)
+		jsapi = {}
+		jsapi['timeStamp'] = data['timestamp']
+		jsapi['appId'] = data['app_id']
+		jsapi['nonceStr'] = data['nonce_str']
+		jsapi['package'] = data['package']
+		jsapi['signType'] = data['sign_type']
+		jsapi['paySign'] = data['pay_sign']
+		self.render('templates/jsapi_demo.html', jsapi=json.dumps(jsapi))
 
 class BillHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -136,7 +136,7 @@ def main():
 		(r"/refund", RefundHandler),
         		(r"/refunds", RefundsHandler),
         		(r"/refund_status", RefundStatusHandler),
-        		(r"/jsapi/demo", JSApiHandler),
+        		(r"/jsapi/demo/online_demo.php", JSApiHandler),
 	],**settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(options.port)
