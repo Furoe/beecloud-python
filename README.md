@@ -12,6 +12,8 @@
 或者下载源码安装  
 `python setup.py install`  
 
+### **目前不能从pip安装, 请先下载源码安装**
+
 ## 依赖
 demo的运行依赖于开源web框架[tornado](http://www.tornadoweb.cn/)
 
