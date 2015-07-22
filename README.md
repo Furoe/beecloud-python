@@ -7,7 +7,7 @@
 
 从pip快速安装  
 `pip install beecloud`  
-跟新  
+更新  
 `pip install beecloud --upgrade`  
 或者下载源码安装  
 `python setup.py install`  
