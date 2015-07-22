@@ -38,6 +38,11 @@ class PayHandler(tornado.web.RequestHandler):
 			    print data
 			    sHtml = data['html']
 			    self.write(sHtml)
+			if pay_type == 'wapalipay':
+			    data = api.pay('ALI_WAP', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result')
+			    print data
+			    sHtml = data['html']
+			    self.write(sHtml)
 			if pay_type == 'wechatQr':
 			    data = api.pay('WX_NATIVE', 1, str(uuid.uuid1()).replace('-',''), '在线白开水')
 			    self.render('templates/nativeapi_demo.html', data=data['code_url'])
