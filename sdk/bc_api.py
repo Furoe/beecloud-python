@@ -72,6 +72,16 @@ class BCApi(object):
         r['result_msg'] = 'RUN_TIME_ERROR'
         return r
 
+    #parameters
+    #channel 订单渠道：可能取值参考pay_channels
+    #total_fee订单金额：以分为单位，正整数
+    #bill_no    订单号：32位以内数字或字母组合
+    #title         订单标题：32位以内字母数字汉字
+    #optional   订单补充参数，为一个dict会在webhook时返回
+    #return_url   订单完成返回页面， ALI_WEB, UN_WEB， ALI_WAP时填写
+    #show_url 订单前台展示页面 
+    #qr_pay_mode ALI_QRCODE时填写，取值0，1， 3代表二维码的大小
+    #openid 当WX_JSAPI时填写，微信用户的openid
     def pay(self, channel, total_fee, bill_no, title, return_url = None, optional = None, show_url = None,
             qr_pay_mode = None, openid = None):
         pay_data = {}
@@ -133,6 +143,11 @@ class BCApi(object):
 
         return httpPost(self.random_server() + '/' + self.api_version + '/' + self.pay_url, pay_data)
 
+    #参数说明
+    #channel 退款渠道，参见refund_channels
+    #refund_fee   退款金额，单位为分，正整数，不能大于订单的可退金额
+    #refund_no  退款单号 32位以内字母数字，以8位日期开头 + 3-24位流水号，流水号不能为000
+    #bill_no 退款订单的订单号
     def refund(self, channel, refund_fee, refund_no, bill_no, optional = None):
         pay_data = {}
 
@@ -182,6 +197,13 @@ class BCApi(object):
 
         return httpPost(self.random_server() + '/' + self.api_version + '/' + self.refund_url, pay_data)
 
+    #参数说明
+    #channel，查询的渠道，参见query_channels
+    #bill_no,   查询的订单号
+    #start_time,    订单时间起始于， 13位正整数时间戳， 为距离1970-1-1的毫秒数
+    #end_time,     订单时间结束于， 13位正整数时间戳， 为距离1970-1-1的毫秒数
+    #skip,   整数>= 0， 代表从查询结果的第多少个开始
+    #limit,    正整数<=50 , 代表获取多少个结果
     def query_bill(self, channel, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret:
             return self.param_miss('bc_app_id, bc_app_secret')
@@ -224,7 +246,15 @@ class BCApi(object):
             return json.loads(value)
          else:
             return self.runtime_error()
-
+    
+    #参数说明
+    #channel，查询的渠道，参见query_channels
+    #bill_no,   查询的订单号
+    #bill_no,   查询的退款单号
+    #start_time,    订单时间起始于， 13位正整数时间戳， 为距离1970-1-1的毫秒数
+    #end_time,     订单时间结束于， 13位正整数时间戳， 为距离1970-1-1的毫秒数
+    #skip,   整数>= 0， 代表从查询结果的第多少个开始
+    #limit,    正整数<=50 , 代表获取多少个结果
     def query_refund(self, channel, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret :
             return self.param_miss('bc_app_id, bc_app_secret')
@@ -271,6 +301,9 @@ class BCApi(object):
          else:
             return self.runtime_error()
 
+    #参数说明
+    #channel  目前只支持'WX'
+    #refund_no 需要更新状态的退款单号
     def refund_status(self, channel, refund_no):
          if not self.bc_app_id or not self.bc_app_secret :
             return self.param_miss('bc_app_id, bc_app_secret')
@@ -359,6 +392,10 @@ class BCApi(object):
             return json.loads(value)
         return None
 
+
+    # 以下是公众号支付可能需要的辅助方法
+
+    
     # 获取code参考 fetch_code method
     def fetch_open_id(self, code):
         if not code :
