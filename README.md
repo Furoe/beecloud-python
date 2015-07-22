@@ -44,7 +44,7 @@ api = BCApi()
 方法原型：
 
 ```python
-def pay(self, channel, total_fee, bill_no, title, return_url = None, optional = None, show_url = None,python qr_pay_mode = None, openid = None):
+def pay(self, channel, total_fee, bill_no, title, return_url = None, optional = None, show_url = None, qr_pay_mode = None, openid = None):
 ```
 
 调用：
