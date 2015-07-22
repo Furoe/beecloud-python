@@ -8,6 +8,7 @@ import uuid
 import os
 import md5
 import time
+import re
 
 from datetime import datetime
 from tornado.options import define, options
@@ -23,19 +24,25 @@ home = 'http://queue.beecloud.cn/'
 
 class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
+		user_agent = self.request.headers['User-Agent']
+		ali_type = 'alipay'
+		if re.match(".*(android|ipad|iphone|midp|rv:1.2.3.4|ucweb|windows ce|windows mobile)+.*", user_agent.lower()):
+			ali_type='wapalipay'
 		sign = md5.new(BCApi.bc_app_id + "test" + "8506" + "test0001" + BCApi.bc_app_secret)
 		print sign.hexdigest()
-		self.render('templates/index.html', out_trade_no = str(uuid.uuid1()).replace('-',''),sign = sign.hexdigest())
+		self.render('templates/index.html', out_trade_no = str(uuid.uuid1()).replace('-',''),sign = sign.hexdigest(), ali_type=ali_type)
 
 class PayHandler(tornado.web.RequestHandler):
 	def post(self):
 		try:
 			pay_type = self.get_argument('paytype')
+			print pay_type
 			if pay_type == 'alipay':
-			    print '11111'
+			    
 			    data = api.pay('ALI_WEB', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result')
-			    print '222222'
+			    
 			    print data
+			    print data['err_detail']
 			    sHtml = data['html']
 			    self.write(sHtml)
 			if pay_type == 'wapalipay':
