@@ -167,5 +167,5 @@ shell里进入工程文件夹，运行
 ```shell
 python demo/index.py
 ```
-
-打开浏览器访问localhost即可(可自行修改端口)
+可自行修改端口
+打开浏览器访问localhost即可
