@@ -60,7 +60,8 @@ class PayHandler(tornado.web.RequestHandler):
 			    print data
 			    self.write(data['html'])
 			if pay_type == 'qralipay':
-			    temp = api.pay('ALI_WEB', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result', qr_pay_mode = '0')
+			    temp = api.pay('ALI_QRCODE', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result', qr_pay_mode = '0')
+			    print temp
 			    self.render('templates/qr_demo.html', qrapi=temp)
 		except Exception, e:
 			print e
