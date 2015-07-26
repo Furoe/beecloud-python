@@ -136,6 +136,10 @@ class RefundHandler(tornado.web.RequestHandler):
 	       print bill_no
 	       data = api.refund(channel, refund_fee, refund_no, bill_no)
 	       print data
+	       url = data['url']
+	       if url:
+	       	print url
+	       	self.redirect(url)
 	       self.render('templates/refund_result.html', data = data)
 
 
