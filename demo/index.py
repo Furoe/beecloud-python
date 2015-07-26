@@ -140,9 +140,6 @@ class RefundHandler(tornado.web.RequestHandler):
 	       if url:
 	       	print url
 	       	self.redirect(url)
-	       if data['html']:
-	       	self.write(data['html'])
-	       	return
 	       self.render('templates/refund_result.html', data = data)
 
 
