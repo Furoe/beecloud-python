@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'beecloud',
-    version = '1.2.4',
+    version = '2.0',
       
     keywords = ('beecloud', 'pay'),
     description = 'beecloud, make pay more simple',
-    license = 'Copyright 2014-2015 beecloud',
+    license = 'MIT License',
     install_requires = [],
 
     author = 'Joseph Gao',
