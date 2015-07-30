@@ -28,9 +28,10 @@ class IndexHandler(tornado.web.RequestHandler):
 		ali_type = 'alipay'
 		if re.match(".*(android|ipad|iphone|midp|rv:1.2.3.4|ucweb|windows ce|windows mobile)+.*", user_agent.lower()):
 			ali_type='wapalipay'
-		sign = md5.new(BCApi.bc_app_id + "test" + "8506" + "test0001" + BCApi.bc_app_secret)
+		out_trade_no = str(uuid.uuid1()).replace('-','');
+		sign = md5.new(BCApi.bc_app_id + "test" + "1" + out_trade_no + BCApi.bc_app_secret)
 		print sign.hexdigest()
-		self.render('templates/index.html', out_trade_no = str(uuid.uuid1()).replace('-',''),sign = sign.hexdigest(), ali_type=ali_type)
+		self.render('templates/index.html', out_trade_no = out_trade_no, sign = sign.hexdigest(), ali_type=ali_type)
 
 class PayHandler(tornado.web.RequestHandler):
 	def post(self):

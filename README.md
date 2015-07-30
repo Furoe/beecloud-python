@@ -2,6 +2,9 @@
 ![pass](https://img.shields.io/badge/Build-pass-green.svg) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v2.0-blue.svg)
 
 本SDK是根据[BeeCloud Rest API](https://github.com/beecloud/beecloud-rest-api) 开发的 python SDK, 适用于python2.5及以上版本。可以作为调用BeeCloud Rest API的示例或者直接用于生产。
+### [Python-SDK Changelog](https://github.com/beecloud/beecloud-python/blob/master/changelog.txt)
+
+### [所有Python-SDK RELEASE版本](https://github.com/beecloud/beecloud-python/releases)
 
 ## 安装 Python SDK
 
