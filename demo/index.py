@@ -39,11 +39,8 @@ class PayHandler(tornado.web.RequestHandler):
 			pay_type = self.get_argument('paytype')
 			print pay_type
 			if pay_type == 'alipay':
-			    
 			    data = api.pay('ALI_WEB', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', return_url = 'http://58.211.191.85:8088/result')
-			    
 			    print data
-			    print data['err_detail']
 			    sHtml = data['html']
 			    self.write(sHtml)
 			if pay_type == 'wapalipay':
@@ -52,7 +49,7 @@ class PayHandler(tornado.web.RequestHandler):
 			    sHtml = data['html']
 			    self.write(sHtml)
 			if pay_type == 'wechatQr':
-			    data = api.pay('WX_NATIVE', 1, str(uuid.uuid1()).replace('-',''), '在线白开水')
+			    data = api.pay('WX_NATIVE', 1, str(uuid.uuid1()).replace('-',''), '在线白开水', optional={"opchannel":"1002"})
 			    self.render('templates/nativeapi_demo.html', data=data['code_url'])
 			if pay_type == 'jsapi':
 			    self.redirect('/jsapi/demo')
@@ -94,9 +91,9 @@ class JSApiHandler(tornado.web.RequestHandler):
 
 class BillHandler(tornado.web.RequestHandler):
 	def get(self):
-	       channel = self.get_argument('channel')
-	       if not channel:
-	       	channel = 'WX'
+	       channel = ''
+	       if 'channel' in self.request.arguments.keys():
+	       	channel = self.get_argument('channel')
 	       data = api.query_bill(str(channel))
 	       print data
 	       bills = data['bills']
@@ -104,9 +101,9 @@ class BillHandler(tornado.web.RequestHandler):
 
 class RefundsHandler(tornado.web.RequestHandler):
 	def get(self):
-	       channel = self.get_argument('channel')
-	       if not channel:
-	       	channel = 'WX'
+	       channel = ''
+	       if 'channel' in self.request.arguments.keys():
+	       	channel = self.get_argument('channel')
 	       data = api.query_refund(str(channel))
 	       print data
 	       refunds = data['refunds']
@@ -124,9 +121,10 @@ class RefundStatusHandler(tornado.web.RequestHandler):
 
 class RefundHandler(tornado.web.RequestHandler):
 	def get(self):
-	       channel = self.get_argument('channel')
-	       if not channel:
-	       	channel = 'WX'
+	       channel = ''
+
+	       if 'channel' in self.request.arguments.keys():
+	       	channel = self.get_argument('channel')
 
 	       bill_no = self.get_argument("bill_no")
 	       refund_fee = self.get_argument("refund_fee")
@@ -135,8 +133,9 @@ class RefundHandler(tornado.web.RequestHandler):
 	       refund_no = str(date) + str(uuid.uuid1()).replace('-','')[0:23]
 	       print refund_no
 	       print bill_no
-	       data = api.refund(channel, refund_fee, refund_no, bill_no)
+	       data = api.refund(refund_fee, refund_no, bill_no, channel = channel)
 	       print data
+	       print data['err_detail']
 	       url = data['url']
 	       if url:
 	       	print url

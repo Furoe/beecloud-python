@@ -15,13 +15,15 @@
         <td>订单金额</td>
         <td>订单标题</td>
         <td>订单状态</td>
+        <td>渠道</td>
         <td>操作</td>
     </tr>
 
     {% for bill in bills %}
     <tr>
      <td>{{bill['bill_no']}}</td>  <td>{{bill['total_fee']}}</td> <td>{{bill['title']}}</td> <td>{{bill['spay_result']}}</td>
-     <td>{% if bill['spay_result'] %} <a href = "/refund?channel={{channel}}&bill_no={{bill['bill_no']}} &refund_fee={{bill['total_fee']}}" target='_blank'> 退款
+     <td>{{bill['channel']}}
+     <td>{% if bill['spay_result'] %} <a href = "/refund?bill_no={{bill['bill_no']}} &refund_fee={{bill['total_fee']}}" target='_blank'> 退款
      </a>{% end %}
  </tr>
     {% end %}

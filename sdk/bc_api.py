@@ -10,7 +10,8 @@ import time
 class BCApi(object):
     bc_servers = ['https://apibj.beecloud.cn', 'https://apisz.beecloud.cn', 'https://apiqd.beecloud.cn', 'https://apihz.beecloud.cn', 'https://api.beecloud.cn']
     #bc_servers = ['http://58.211.191.123:8080']
-    # bc_servers = ['http://127.0.0.1:8080']
+    #bc_servers = ['http://127.0.0.1:8080']
+    #bc_servers = ['https://apibj.beecloud.cn']
     #api version
     api_version = '1'
 
@@ -148,14 +149,11 @@ class BCApi(object):
     #refund_fee   退款金额，单位为分，正整数，不能大于订单的可退金额
     #refund_no  退款单号 32位以内字母数字，以8位日期开头 + 3-24位流水号，流水号不能为000
     #bill_no 退款订单的订单号
-    def refund(self, channel, refund_fee, refund_no, bill_no, optional = None):
+    def refund(self, refund_fee, refund_no, bill_no, channel = None,  optional = None):
         pay_data = {}
 
         if not self.bc_app_id or not self.bc_app_secret :
             return self.param_miss('bc_app_id, bc_app_secret')
-        
-        if not channel:
-            return self.param_miss('channel')
 
         if not refund_fee:
             return self.param_miss('refund_fee')
@@ -163,7 +161,7 @@ class BCApi(object):
         if not refund_no:
             return self.param_miss('refund_no')
 
-        if not channel in self.refund_channels:
+        if channel and not channel in self.refund_channels:
             return self.param_invalid('channel', '应该在' + str(self.refund_channels) + '中')
 
         if int(refund_fee) < 0:
@@ -181,7 +179,8 @@ class BCApi(object):
             return self.param_invalid('bill_no', '只能字母数字组合')
         
         pay_data = {}
-        pay_data['channel'] = channel
+        if channel:
+            pay_data['channel'] = channel
         pay_data['app_id'] = self.bc_app_id
         timestamp = long(time.time()) * 1000
         pay_data['timestamp'] = timestamp
@@ -204,18 +203,16 @@ class BCApi(object):
     #end_time,     订单时间结束于， 13位正整数时间戳， 为距离1970-1-1的毫秒数
     #skip,   整数>= 0， 代表从查询结果的第多少个开始
     #limit,    正整数<=50 , 代表获取多少个结果
-    def query_bill(self, channel, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
+    def query_bill(self, channel = None, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret:
             return self.param_miss('bc_app_id, bc_app_secret')
-        
-         if not channel:
-            return self.param_miss('channel')
 
-         if not channel in self.query_channels:
+         if channel and not channel in self.query_channels:
             return self.param_invalid('channel', '应该在' + str(self.query_channels) + '中')
 
          pay_data = {}
-         pay_data['channel'] = channel
+         if channel : 
+            pay_data['channel'] = channel
          pay_data['app_id'] = self.bc_app_id
          timestamp = long(time.time()) * 1000
          pay_data['timestamp'] = timestamp
@@ -255,18 +252,16 @@ class BCApi(object):
     #end_time,     订单时间结束于， 13位正整数时间戳， 为距离1970-1-1的毫秒数
     #skip,   整数>= 0， 代表从查询结果的第多少个开始
     #limit,    正整数<=50 , 代表获取多少个结果
-    def query_refund(self, channel, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
+    def query_refund(self, channel = None, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
          if not self.bc_app_id or not self.bc_app_secret :
             return self.param_miss('bc_app_id, bc_app_secret')
-        
-         if not channel:
-            return self.param_miss('channel')
 
-         if not channel in self.query_channels:
+         if channel and not channel in self.query_channels:
             return self.param_invalid('channel', '应该在' + str(self.query_channels) + '中')
 
          pay_data = {}
-         pay_data['channel'] = channel
+         if channel: 
+            pay_data['channel'] = channel
          pay_data['app_id'] = self.bc_app_id
          timestamp = long(time.time()) * 1000
          pay_data['timestamp'] = timestamp

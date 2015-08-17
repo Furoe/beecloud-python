@@ -17,6 +17,7 @@
         <td>退款金额</td>
         <td>是否退款成功</td>
         <td>退款是否结束</td>
+        <td>渠道</td>
         {% if channel == 'WX' %}
         <td>操作</td>
         {% end %}
@@ -26,6 +27,7 @@
     <tr>
      <td>{{refund['bill_no']}}</td>  <td>{{refund['refund_no']}}</td> <td>{{refund['total_fee']}}</td>  <td>{{refund['refund_fee']}}</td>  <td>{{refund['result']}}</td>
       <td>{{refund['finish']}}</td>
+      <td>{{refund['channel']}}
       {% if channel == 'WX' %}
      <td> {% if not refund['finish'] %}<a href = "/refund_status?channel={{channel}}&refund_no={{refund['refund_no']}} " target='_blank'> 更新退款状态
      </a> {% end %}</td>{% end %}
