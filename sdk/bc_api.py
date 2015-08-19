@@ -8,10 +8,7 @@ import re
 from datetime import datetime
 import time
 class BCApi(object):
-    bc_servers = ['https://apibj.beecloud.cn', 'https://apisz.beecloud.cn', 'https://apiqd.beecloud.cn', 'https://apihz.beecloud.cn', 'https://api.beecloud.cn']
-    #bc_servers = ['http://58.211.191.123:8080']
-    #bc_servers = ['http://127.0.0.1:8080']
-    #bc_servers = ['https://apibj.beecloud.cn']
+    bc_servers = ['https://apibj.beecloud.cn', 'https://apisz.beecloud.cn', 'https://apiqd.beecloud.cn', 'https://apihz.beecloud.cn']
     #api version
     api_version = '1'
 
