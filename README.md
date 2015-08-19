@@ -70,14 +70,14 @@ data = api.pay('UN_WEB', 1, str(uuid.uuid1()).replace('-',''), '在线白开水'
 方法原型：
 
 ```python
-def refund(self, channel, refund_fee, refund_no, bill_no, optional = None):
+def refund(self, refund_fee, refund_no, bill_no, channel=None, optional = None):
 ```
 调用：
 
 ```python
-data = api.refund('WX', 1, '201507083211', 'somebillno')
-data = api.refund('ALI', 1, '201507083211', 'somebillno')
-data = api.refund('UN', 1, '201507083211', 'somebillno')
+data = api.refund(1, '201507083211', 'somebillno')
+data = api.refund(1, '201507083211', 'somebillno')
+data = api.refund(1, '201507083211', 'somebillno')
 ```
 3.查询
 
@@ -86,15 +86,13 @@ data = api.refund('UN', 1, '201507083211', 'somebillno')
 方法原型：
 
 ```python
-def query_bill(self, channel, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
+def query_bill(self, channel = None, bill_no = None, start_time = None, end_time = None, skip = None, limit = None):
 ```
 调用：
 
 ```python
-data = api.query_bill('WX')
-data = api.query_bill('WX_NATIVE')
-data = api.query_bill('ALI')
-data = api.query_bill('UN')
+data = api.query_bill(channel = 'WX')
+data = api.query_bill(bill_no = '201508191010xxxxx')
 #...
 ```
 * 查询退款订单
@@ -102,15 +100,14 @@ data = api.query_bill('UN')
 方法原型：
 
 ```python
-def query_refund(self, channel, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
+def query_refund(self, channel = None, bill_no = None, refund_no = None, start_time = None, end_time = None, skip = None, limit = None):
 ```
 调用：
 
 ```python
 data = api.query_refund('WX')
-data = api.query_refund('WX_NATIVE')
-data = api.query_refund('ALI')
-data = api.query_refund('UN')
+data = api.query_refund('bill_no' = '201508191010xxxxx')
+data = api.query_refund('refund_no' = '201508191148vvvvvv')
 #...
 ```
 * 查询退款状态（只支持微信）
