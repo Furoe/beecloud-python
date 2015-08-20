@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-![pass](https://img.shields.io/badge/Build-pass-green.svg) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v2.0-blue.svg)
+![pass](https://img.shields.io/badge/Build-pass-green.svg) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v2.0.1-blue.svg)
 
 本SDK是根据[BeeCloud Rest API](https://github.com/beecloud/beecloud-rest-api) 开发的 python SDK, 适用于python2.5及以上版本。可以作为调用BeeCloud Rest API的示例或者直接用于生产。
 
@@ -135,7 +135,7 @@ data = api.refund_status('WX', '20150729000001')
 TODO
 
 ## 常见问题
-待补充
+1. 由于支付宝的限制，beecloud的支付宝账号不能用来做demo测试， 所以支付宝demo的最后一步支付无法完成，请用户使用自己的appId和appSecret来进行测试
 
 ## 代码贡献
 我们非常欢迎大家来贡献代码，我们会向贡献者致以最诚挚的敬意。
