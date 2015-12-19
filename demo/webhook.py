@@ -16,7 +16,7 @@ class MainHandler(tornado.web.RequestHandler):
         appsecret = ''
         timestamp = data['timestamp']
         sign = data['sign']
-        thissign = hashlib.md5(appid+appsecret+str(timestamp))
+        thissign = hashlib.md5(appid+appsecret+str(timestamp)).hexdigest()
         # 验证签名
         if thissign == sign:
             self.write('success')
