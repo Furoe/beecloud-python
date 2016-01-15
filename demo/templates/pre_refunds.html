@@ -2,26 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>退款订单列表</title>
+    <title>预退款审核</title>
     <link type="text/css" rel="stylesheet" href="static/demo.css" />
     <script language="JavaScript" type="text/javascript" src="static/jquery-2.1.4.min.js"></script>
 
     <script type="text/javascript">
-         $(document).ready(function(){
-            $.ajax({
-                type:'get',
-                url:'/refunds_count?channel={{ channel }}',
-                success:function(data){
-                    $("#total_count").text(data);
+        function approve_pre_refunds() {
+            var tmp="";
+            $("input[type=checkbox]").each(function(){
+                if(this.checked){
+                    tmp += $(this).val();
+                    tmp += "@";
                 }
             });
-        });
+
+            if (tmp.length > 1){
+                tmp = tmp.substring(0, tmp.length - 1);
+                window.open("/audit_pre_refunds?ids=" + tmp + '&channel=' + $('#channel').val());
+            }
+        }
     </script>
 </head>
 <body>
-    <h3 style="color: #ff6c2c">退款状态更新接口提供查询退款状态以更新退款状态的功能，用于对退款后不发送回调的渠道（WX、YEE、KUAIQIAN、BD）退款后的状态更新。</h3>
+    <h3>注意：批量审核必须针对同一个渠道发起</h3>
+    {% if pre_refunds|count %}<input type="hidden" id="channel" value="{{ pre_refunds[0].channel }}" />{% endif %}
     <table>
         <tr>
+            <th>审核通过</th>
             <th>退款记录的唯一标识</th>
             <th>支付订单号</th>
             <th>支付渠道</th>
@@ -35,12 +42,12 @@
             <th>退款金额/分</th>
             <th>退款单号</th>
             <!-- <th>渠道详细信息</th> -->
-            <th width="60px">退款状态</th>
         </tr>
 
-        {% for refund in refunds %}
+        {% for refund in pre_refunds %}
         <tr {% if not loop.index%2 %} class="blue_bg" {% endif %}>
-            <td><a href="/refund/id/{{ refund.id }}" target="_blank">{{ refund.id }}</a></td>
+            <td><input name="approveCB" type="checkbox" value="{{ refund.id }}" /></td>
+            <td>{{ refund.id }}</td>
             <td>{{ refund.bill_no }}</td>
             <td>{{ refund.channel }}</td>
             <td>{{ refund.sub_channel }}</td>
@@ -53,17 +60,13 @@
             <td>{{ refund.refund_fee }}</td>
             <td>{{ refund.refund_no  }}</td>
             <!-- <td>{{ refund.message_detail }}</td> -->
-            <td>
-                {% if refund.channel in ['WX','YEE','KUAIQIAN','BD'] %}
-                <a href="/refund_status?channel={{ refund.channel }}&refund_no={{ refund.refund_no }}" target="_blank">查询</a>
-                {% endif %}
-            </td>
         </tr>
         {% endfor %}
 
     </table>
 
-    <div style="margin:30px;font-size: large">相同条件下的退款总数：
-        <span id="total_count" style="color: #ff6c2c"></span></div>
+    <input onclick="approve_pre_refunds()" type="button" class="button" value="同意预退款" />
+    <div style="height: 50px"></div>
+    <h3>注意：当channel为ALI时，如果退款成功，map中包含支付宝退款地址，需用户在支付宝平台上手动输入支付密码处理！</h3>
 </body>
 </html>

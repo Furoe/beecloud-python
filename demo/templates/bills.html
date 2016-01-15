@@ -1,37 +1,73 @@
-<CTYPE html>
-<html class="ui-mobile"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8">
     <title>订单列表</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="/resource/iconfont/iconfont.css"/>
-    <script type="text/javascript" src="/lib/js/jquery-1.11.1.min.js"></script>
-</head>
 
-<body style="padding:0;margin: 0;">
-<table width=”450″ border="1" cellspacing="0" cellpadding="2" bordercolor="#009900">
-    <tr>
-        <td>订单号</td>
-        <td>订单金额</td>
-        <td>订单标题</td>
-        <td>订单状态</td>
-        <td>渠道</td>
-        <td>操作</td>
-    </tr>
+    <link type="text/css" rel="stylesheet" href="static/demo.css" />
+    <script language="JavaScript" type="text/javascript" src="static/jquery-2.1.4.min.js"></script>
+
+    <script type="text/javascript">
+         $(document).ready(function(){
+            $.ajax({
+                type:'get',
+                url:'/bills_count?channel={{ channel }}',
+                success:function(data){
+                    $("#total_count").text(data);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h3 style="color: #ff6c2c">此处为了方便退款，只列出了支付成功的订单</h3>
+    <table>
+        <tr>
+            <th>订单记录的唯一标识</th>
+            <th>支付订单号</th>
+            <th>支付渠道</th>
+            <th>支付子渠道</th>
+            <th>渠道返回的交易号</th>
+            <th>订单创建时间</th>
+            <!-- <th>附加数据</th> -->
+            <th>订单是否成功</th>
+            <th>商品标题</th>
+            <th>订单金额/分</th>
+            <!-- <th>渠道详细信息</th> -->
+            <th>订单是否已经撤销</th>
+            <th>订单是否已经退款</th>
+            <th width="30px">退款</th>
+            <th width="30px">预退款</th>
+        </tr>
 
     {% for bill in bills %}
-    <tr>
-     <td>{{bill['bill_no']}}</td>  <td>{{bill['total_fee']}}</td> <td>{{bill['title']}}</td> <td>{{bill['spay_result']}}</td>
-     <td>{{bill['channel']}}
-     <td>{% if bill['spay_result'] %} <a href = "/refund?bill_no={{bill['bill_no']}} &refund_fee={{bill['total_fee']}}" target='_blank'> 退款
-     </a>{% end %}
- </tr>
-    {% end %}
-</table>
+        <tr {% if not loop.index%2 %} class="blue_bg" {% endif %}>
+            <td><a href="/bill/id/{{ bill.id }}" target="_blank">{{ bill.id }}</a></td>
+            <td>{{ bill.bill_no }}</td>
+            <td>{{ bill.channel }}</td>
+            <td>{{ bill.sub_channel }}</td>
+            <td>{{ bill.trade_no }}</td>
+            <td>{{ bill.create_time | format_utc_time }}</td>
+            <!-- <td>{{ bill.optional }}</td>  -->
+            <td>{{ bill.spay_result  }}</td>
+            <td>{{ bill.title }}</td>
+            <td>{{ bill.total_fee }}</td>
+            <!-- <td>{{ bill.message_detail }}</td>  -->
+            <td>{{ bill.revert_result  }}</td>
+            <td>{{ bill.refund_result }}</td>
+            <td>{% if not bill.refund_result %}
+                <a href="/refund?bill_no={{ bill.bill_no }}&channel={{ bill.channel }}&refund_fee={{ bill.total_fee }}" target="_blank">退款</a>
+                {% endif %}
+            </td>
+            <td>{% if not bill.refund_result %}
+                <a href="/refund?bill_no={{ bill.bill_no }}&channel={{ bill.channel }}&refund_fee={{ bill.total_fee }}&need_approval=True" target="_blank">预退款</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <div style="margin:30px;font-size: large">相同条件下的订单总数：
+        <span id="total_count" style="color: #ff6c2c"></span></div>
 </body>
-
-<script>
-    
-</script>
 </html>
-

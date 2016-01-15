@@ -1,4 +1,9 @@
-/dist/*
-/build/*
-beecloud.egg-info/*
 *.swp
+demo/.idea/*
+sdk/.idea/*
+sdk/beecloud/__pycache__/*
+beecloud.egg-info/*
+sdk/beecloud.egg-info/*
+sdk/dist/*
+sdk/build/*
+tests/.idea/*
