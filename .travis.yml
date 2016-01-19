@@ -7,7 +7,9 @@ python:
 # command to install dependencies
 install:
   - pip install requests
-  - python sdk/setup.py install
+  - cd sdk
+  - python setup.py install
+  - cd ..
 # command to run tests
 script:
    - python tests/unit/test_utils.py
