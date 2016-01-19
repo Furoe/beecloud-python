@@ -61,14 +61,14 @@ app.is_test_mode = True
 bc_app.app_id = 'your app id'
 bc_app.test_secret = 'your app test secret'
 ```
-
+<br/>
 2. 对于支付、打款和退款，需要初始化BCPay：
 ```python
 from beecloud.pay import BCPay
 bc_pay = BCPay()
 bc_pay.register_app(bc_app)
 ```
-
+<br/>
 3. 对于查询需要初始化BCQuery：
 ```python
 from beecloud.query import BCQuery
