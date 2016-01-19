@@ -29,7 +29,7 @@ demo依赖于开源web框架[Flask](http://flask.pocoo.org/)
 
 ## 使用方法
 * 具体使用请参考项目中的`demo`代码；
-* 关于字符串的说明，对于`python2`如果需要传入的参数包含中文字符，请传入`unicode`，对于网络请求成功的情况，BCResult中返回结果的字符串也是`unicode`形式；对于`python3`，不需要考虑这样的细节；
+* 关于字符串的说明，对于`python2`如果需要传入的参数包含中文字符，请传入`unicode`，对于网络请求成功的情况，`BCResult`中返回结果的字符串也是`unicode`形式；对于`python3`，不需要考虑这样的细节；
 * 以下的示例和`demo`中出现的关键字`u`（`unicode`）是为了兼容处理，在`python3`环境下不需要作这样的处理；
 * 关于请求参数，公用字段（`app_id`，`timestamp`，`app_sign`）会自动处理，不要手动设置，其他字段和`REST API`一致（例如`REST API`中支付部分，对于`WX_JSAPI`支付方式，`openid`是必填的，假设请求参数名为`req_params`，那么应该添加这样的设置 `req_params.openid = 'openid_str'`），请参考[官网](https://beecloud.cn/doc/?index=0)说明，打款和境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
 * 返回结果是`beecloud.entity.BCResult`实例，包含以下公共字段，其他字段因不同API而异（例如`REST API`中支付部分，支付完成后会返回支付表记录唯一标识`id`，假设返回参数名为`result`，可以通过`result.id`获取结果），同理，请参照上一条列出的文档
@@ -61,12 +61,14 @@ app.is_test_mode = True
 bc_app.app_id = 'your app id'
 bc_app.test_secret = 'your app test secret'
 ```
+
 2. 对于支付、打款和退款，需要初始化BCPay：
 ```python
 from beecloud.pay import BCPay
 bc_pay = BCPay()
 bc_pay.register_app(bc_app)
 ```
+
 3. 对于查询需要初始化BCQuery：
 ```python
 from beecloud.query import BCQuery
@@ -141,12 +143,12 @@ result = bc_pay.audit_pre_refunds(req_params)
 ### 5.打款
 可以参考`demo.py`中`app_transfer`
 
-方法原型：
+#### 原型：
 打款分`单笔打款`和`批量打款`；<br/>
 `单笔打款`包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；<br/>
 `批量打款`目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 
-调用：
+#### 调用：
 * 单笔打款
 以微信红包为例
 ```python
