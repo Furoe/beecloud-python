@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-![pass](https://img.shields.io/badge/Build-pass-green.svg) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v2.0.1-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.0.0-blue.svg)
 
 ## 简介
 
@@ -20,7 +20,7 @@
 
 
 ## 依赖
-sdk依赖于开源库[requests](http://docs.python-requests.org/en/latest/)
+sdk依赖于开源库[requests](http://docs.python-requests.org/en/latest/)<br/>
 demo依赖于开源web框架[Flask](http://flask.pocoo.org/)
 
 ## 准备工作
@@ -31,8 +31,8 @@ demo依赖于开源web框架[Flask](http://flask.pocoo.org/)
 * 具体使用请参考项目中的`demo`代码；
 * 关于字符串的说明，对于`python2`如果需要传入的参数包含中文字符，请传入`unicode`，对于网络请求成功的情况，BCResult中返回结果的字符串也是`unicode`形式；对于`python3`，不需要考虑这样的细节；
 * 以下的示例和`demo`中出现的关键字`u`（`unicode`）是为了兼容处理，在`python3`环境下不需要作这样的处理；
-* 关于请求参数，公用字段（app_id，timestamp，app_sign）会自动处理，不要手动设置，其他字段和`REST API`一致，请参考[官网](https://beecloud.cn/doc/?index=0)说明，打款和境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
-* 返回结果是beecloud.entity.BCResult实例，包含以下公共字段，其他字段因不同API而异，同理，请参照上一条列出的文档
+* 关于请求参数，公用字段（`app_id`，`timestamp`，`app_sign`）会自动处理，不要手动设置，其他字段和`REST API`一致（例如`REST API`中支付部分，对于`WX_JSAPI`支付方式，`openid`是必填的，假设请求参数名为`req_params`，那么应该添加这样的设置 `req_params.openid = 'openid_str'`），请参考[官网](https://beecloud.cn/doc/?index=0)说明，打款和境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
+* 返回结果是`beecloud.entity.BCResult`实例，包含以下公共字段，其他字段因不同API而异（例如`REST API`中支付部分，支付完成后会返回支付表记录唯一标识`id`，假设返回参数名为`result`，可以通过`result.id`获取结果），同理，请参照上一条列出的文档
 
 参数名 | 说明
 ---- | -----
@@ -100,7 +100,7 @@ req_params.return_url = 'https://beecloud.cn/'
 
 
 ### 3.退款
-可以参考`demo.py`中`app_refund`
+可以参考`demo.py`中`app_refund`；<br/>
 退款接口包含预退款功能，当need_approval字段的值为true时，该接口开启预退款功能，预退款仅创建退款记录，并不真正发起退款，需后续调用审核接口
 
 #### 原型：
@@ -119,6 +119,7 @@ result = bc_pay.refund(refund_params)
 # 对于支付宝退款，需要重定向至result.url
 ```
 
+
 ### 4.预退款批量审核
 可以参考`demo.py`中`app_audit_pre_refunds`
 
@@ -136,12 +137,13 @@ result = bc_pay.audit_pre_refunds(req_params)
 # 对于支付宝，需要重定向至result.url
 ```
 
+
 ### 5.打款
 可以参考`demo.py`中`app_transfer`
 
 方法原型：
-打款分`单笔打款`和`批量打款`；
-`单笔打款`包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；
+打款分`单笔打款`和`批量打款`；<br/>
+`单笔打款`包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；<br/>
 `批量打款`目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 
 调用：
@@ -166,6 +168,7 @@ result = bc_pay.transfer(transfer_params)
 # result.result_code等于0表示打款成功
 # 对于支付宝需要重定向到result.url
 ```
+
 * 批量打款
 ```python
 transfer_params = BCBatchTransferParams()
@@ -194,6 +197,7 @@ result = bc_pay.batch_transfer(transfer_params)
 # result.result_code等于0时需要重定向到result.url
 ```
 
+
 ### 6.查询支付订单
 可以参考`demo.py`中`app_query_bills`
 
@@ -211,6 +215,7 @@ result = bc_query.query_bills(query_params)
 # 如果查询成功result.bills为beecloud.entity.BCBill的实例列表
 ```
 
+
 ### 7.查询退款订单
 可以参考`demo.py`中`app_query_refunds`
 
@@ -225,6 +230,7 @@ query_params.channel = 'WX'
 result = bc_query.query_refunds(query_params)
 # 如果查询成功result.refunds为beecloud.entity.BCRefund的实例列表
 ```
+
 
 ### 8.查询支付订单数目
 可以参考`demo.py`中`app_query_bills_count`
@@ -242,6 +248,7 @@ result = bc_query.query_bills_count(query_params)
 # 如果查询成功result.count表示满足条件的数目
 ```
 
+
 ### 9.查询退款订单数目
 可以参考`demo.py`中`app_query_refunds_count`
 
@@ -257,6 +264,7 @@ result = bc_query.query_refunds_count(query_params)
 # 如果查询成功result.count表示满足条件的数目
 ```
 
+
 ### 10.根据ID查询支付订单
 可以参考`demo.py`中`app_bill_by_id`
 
@@ -269,8 +277,9 @@ result = bc_query.query_bill_by_id(bill_id)
 # 如果查询成功result.pay为beecloud.entity.BCBill的实例
 ```
 
+
 ### 11.根据ID查询退款订单
-可以参考`demo.py`中`app_bill_by_id`
+可以参考`demo.py`中`app_refund_by_id`
 
 #### 原型：
 通过`BCQuery`的实例，以`app_refund_by_id`方法，结合退款订单唯一标识id查询
@@ -281,8 +290,9 @@ result = bc_query.query_refund_by_id(refund_id)
 # 如果查询成功result.refund为beecloud.entity.BCRefund的实例
 ```
 
+
 ### 12.退款状态更新
-可以参考`demo.py`中`app_query_refund_status`
+可以参考`demo.py`中`app_query_refund_status`；<br/>
 退款状态更新接口提供查询退款状态以更新退款状态的功能，用于对退款后不发送回调的渠道（WX、YEE、KUAIQIAN、BD）退款后的状态更新
 
 #### 原型：
@@ -294,20 +304,24 @@ result = bc_query.query_refund_status(channel, refund_no)
 # 如果查询成功result.refund_status为查询到的退款状态
 ```
 
+
 ## Demo
-项目中的`demo`工程
-1. 请先安装sdk和[Flask](http://flask.pocoo.org/)
+项目中的`demo`工程<br>
+1. 请先安装sdk和[Flask](http://flask.pocoo.org/)<br/>
 2. 运行：cmd进入`demo`文件夹后，运行
 ```shell
 python demo.py
 ```
 
+
 ## 测试
 项目中的`tests`工程为单元测试
 >依赖[mock](https://pypi.python.org/pypi/mock)
 
+
 ## 常见问题
-1. 由于支付宝的限制，beecloud的支付宝账号不能用来做demo测试， 所以支付宝demo的最后一步支付无法完成，请用户使用自己的appId和appSecret来进行测试
+参见[FAQ](https://beecloud.cn/faq/)
+
 
 ## 代码贡献
 我们非常欢迎大家来贡献代码，我们会向贡献者致以最诚挚的敬意。
