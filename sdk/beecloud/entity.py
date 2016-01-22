@@ -234,7 +234,7 @@ class BCBill:
         # 订单是否已经撤销
         self.revert_result = None
 
-        # 订单是否已经退款 
+        # 订单是否已经退款
         self.refund_result = None
 
 

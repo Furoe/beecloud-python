@@ -20,8 +20,10 @@
 
 
 ## 依赖
-sdk依赖于开源库[requests](http://docs.python-requests.org/en/latest/)<br/>
-demo依赖于开源web框架[Flask](http://flask.pocoo.org/)
+sdk依赖于开源库[requests](http://docs.python-requests.org/en/latest/)，安装sdk时会自动安装，如果意外安装失败，可以手动安装
+`pip install requests`
+demo依赖于开源web框架[Flask](http://flask.pocoo.org/)，需手动安装
+`pip install Flask`
 
 ## 准备工作
 1. 注册开发者：猛击[这里](http://www.beecloud.cn/register)注册成为BeeCloud开发者。
@@ -111,11 +113,14 @@ req_params.return_url = 'https://beecloud.cn/'
 #### 调用：
 ```python
 refund_params = BCRefundReqParams()
+# 退款channel为选填参数
 refund_params.channel = 'WX'
 refund_params.refund_no = 'refundno123'
 refund_params.bill_no = 'billno123'
 # 分为单位
 refund_params.refund_fee = 1
+# need_approval为True时表示预退款，需要后期调用 预退款批量审核 API
+# refund_params.need_approval = True
 result = bc_pay.refund(refund_params)
 # 如果result.result_code为0表示请求成功
 # 对于支付宝退款，需要重定向至result.url
@@ -309,7 +314,7 @@ result = bc_query.query_refund_status(channel, refund_no)
 
 ## Demo
 项目中的`demo`工程<br>
-1. 请先安装sdk和[Flask](http://flask.pocoo.org/)<br/>
+1. 请先安装sdk和[Flask](http://flask.pocoo.org/)，请参考`安装`和`依赖`<br/>
 2. 运行：cmd进入`demo`文件夹后，运行
 ```shell
 python demo.py
@@ -319,6 +324,7 @@ python demo.py
 ## 测试
 项目中的`tests`工程为单元测试
 >依赖[mock](https://pypi.python.org/pypi/mock)
+`pip install mock`
 
 
 ## 常见问题

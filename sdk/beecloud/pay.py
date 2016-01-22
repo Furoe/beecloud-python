@@ -152,10 +152,7 @@ class BCPay:
                 if k == 'redpack_info':     # WX_REDPACK
                     req_dict[k] = obj_to_dict(v)
                 elif k == 'transfer_data':      # batch_transfer
-                    items = []
-                    for item in transfer_params.transfer_data:
-                        items.append(obj_to_dict(item))
-                    req_dict[k] = items
+                    req_dict[k] = [obj_to_dict(item) for item in transfer_params.transfer_data]
                 else:
                     req_dict[k] = v
 

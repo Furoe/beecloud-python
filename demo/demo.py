@@ -19,11 +19,11 @@ app = Flask(__name__)
 
 # init
 bc_app = BCApp()
-# app.is_test_mode = True
+bc_app.is_test_mode = True
 bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
-bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
-bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
-# bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
+# bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+# bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
 bc_pay = BCPay()
 bc_pay.register_app(bc_app)
@@ -133,8 +133,8 @@ def app_query_refunds():
     if request.args.get('channel', '') != 'ALL':
         query_params.channel = request.args.get('channel', '')
 
-    # 过滤退款订单创建时间，此处表示只需要返回北京时间2016-1-13 15:30:00之前的订单
-    query_params.end_time = local_timestamp_since_epoch(datetime.datetime(2016, 1, 13, 15, 30, 00))
+    # 过滤退款订单创建时间，此处表示只需要返回北京时间2016-1-13 15:30:00之后的订单
+    query_params.start_time = local_timestamp_since_epoch(datetime.datetime(2016, 1, 13, 15, 30, 00))
     query_params.skip = 0
     query_params.limit = 16
     result = bc_query.query_refunds(query_params)
@@ -149,8 +149,8 @@ def app_query_refunds_count():
     if request.args.get('channel', '') != 'ALL':
         query_params.channel = request.args.get('channel', '')
 
-    # 过滤退款订单创建时间，此处表示只需要返回北京时间2016-1-13 15:30:00之前的订单
-    query_params.end_time = local_timestamp_since_epoch(datetime.datetime(2016, 1, 13, 15, 30, 00))
+    # 过滤退款订单创建时间，此处表示只需要返回北京时间2016-1-13 15:30:00之后的订单
+    query_params.start_time = local_timestamp_since_epoch(datetime.datetime(2016, 1, 13, 15, 30, 00))
     result = bc_query.query_refunds_count(query_params)
     if result.result_code:
         return result.err_detail
@@ -204,11 +204,13 @@ def app_audit_pre_refunds():
 @app.route('/refund')
 def app_refund():
     refund_params = BCRefundReqParams()
+    # 退款channel为选填参数
     refund_params.channel = request.args.get('channel', '')
     refund_params.refund_no = order_num_on_datetime()
     refund_params.bill_no = request.args.get('bill_no', '')
     refund_params.refund_fee = int(request.args.get('refund_fee', ''))
     if request.args.get('need_approval', ''):
+        # 表示预退款，需要后期调用 预退款批量审核 API
         refund_params.need_approval = True
     result = bc_pay.refund(refund_params)
     if not result.result_code:

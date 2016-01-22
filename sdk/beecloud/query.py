@@ -81,8 +81,8 @@ class BCQuery:
 
             orders = []
             if order_dict_arr:
-                for order_dict in order_dict_arr:
-                    orders.append(self._parse_dict_to_obj(order_dict, query_type))
+                orders = [self._parse_dict_to_obj(order_dict, query_type)
+                          for order_dict in order_dict_arr]
 
             bc_result.count = len(orders)
 

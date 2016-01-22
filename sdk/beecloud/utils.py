@@ -35,7 +35,7 @@ def get_random_host():
 
 
 def obj_to_dict(obj):
-    return {k: v for (k, v) in obj.__dict__.items() if v}
+    return {k: v for (k, v) in obj.__dict__.items() if v is not None}
 
 
 def order_num_on_datetime():
@@ -94,7 +94,8 @@ def obj_to_quote_str(param_obj):
         return urllib.parse.quote_plus(str_tmp)
     else:
         # for py2, str({'a':u'a'}) would be "{'a': u'a'}", so encode dict value
-        tmp_dict = {k: v.encode('UTF-8') if isinstance(v, unicode) else v for (k, v) in param_obj.__dict__.items() if v}
+        tmp_dict = {k: v.encode('UTF-8') if isinstance(v, unicode) else v
+                    for (k, v) in param_obj.__dict__.items() if v is not None}
         str_tmp = str(tmp_dict)
         return urllib.quote_plus(str_tmp)
 
@@ -178,7 +179,7 @@ def attach_app_sign(req_param, req_type, bc_app):
             raise ValueError('test secret is not set')
         else:
             req_param.app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
-                                              bc_app.test_secret).encode('UTF-8')).hexdogest()
+                                              bc_app.test_secret).encode('UTF-8')).hexdigest()
     else:
         if req_type in (BCReqType.REFUND, BCReqType.TRANSFER):
             if not bc_app.master_secret:
