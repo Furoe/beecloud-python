@@ -10,7 +10,7 @@ import datetime
 # 实际项目中建议按需import
 from beecloud.pay import BCPay
 from beecloud.query import BCQuery
-from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch
+from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
     BCTransferRedPack
@@ -31,22 +31,33 @@ bc_pay.register_app(bc_app)
 bc_query = BCQuery()
 bc_query.register_app(bc_app)
 
+wx_appid = "wx419f04c4a731303d";
+wx_app_secret = "21e4b4593ddd200dd77c751f4b964963";
+redirect_url = "http://pythondemo.beecloud.cn/bill"
 
 @app.route('/')
 def hello_index():
     return app.send_static_file('index.html')
-
 
 @app.route('/bill', methods=['POST'])
 def app_bill():
     channel = request.form['channel']
     if channel.startswith('PAYPAL'):
         return _deal_with_international_pay(channel)
+    elif channel == 'WX_JSAPI':
+        code = request.args.get('code', '');
+        if not code:
+            oauth_url = fetch_code(wx_appid, redirect_url + '?channel=' + channel)
+            print oauth_url
+            return redirect(oauth_url)
+        else:
+            open_id = fetch_open_id(wx_appid, wx_app_secret, wx_app_secret)
+            return _deal_with_normal_pay(channel, open_id)
     else:
-        return _deal_with_normal_pay(channel)
+        return _deal_with_normal_pay(channel, '')
 
 
-def _deal_with_normal_pay(channel):
+def _deal_with_normal_pay(channel, open_id):
     # wx js api 需要先获取支付人的open id
     req_params = BCPayReqParams()
     req_params.channel = channel
@@ -74,6 +85,15 @@ def _deal_with_normal_pay(channel):
         return redirect(resp.url)
     elif hasattr(resp, 'html') and resp.html:
         return render_template('blank.html', content=Markup(resp.html))
+    elif req_params.channel == BCChannelType.WX_JSAPI:
+        jsapi = {}
+        jsapi['timeStamp'] = resp['timestamp']
+        jsapi['appId'] = resp['app_id']
+        jsapi['nonceStr'] = resp['nonce_str']
+        jsapi['package'] = resp['package']
+        jsapi['signType'] = resp['sign_type']
+        jsapi['paySign'] = resp['pay_sign']
+        return render_template('jsapi.html', jsapi = jsapi)
 
 
 def _deal_with_international_pay(channel):
@@ -306,5 +326,5 @@ def format_utc_time(s):
 
 if __name__ == '__main__':
     app.debug = True
-    # app.run(host='0.0.0.0')
-    app.run()
+    app.run(host='localhost', port=80)
+#app.run()
