@@ -25,15 +25,21 @@ bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
 # bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
 bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
+#以下是jsapi的测试参数
+bc_app.app_id = 'c787115b-0251-47ca-a051-e86eafb92d4e'
+bc_app.app_secret = '9e0ef79d-eb62-4760-b125-cb0684127526'
+# bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
+wx_appid = "wx119a2bda81854ae0";
+wx_app_secret = "21e4b4593ddd200dd77c751f4b964963";
+redirect_url = "http://pythondemo.beecloud.cn/bill"
+#jsapi测试参数结束
+
 bc_pay = BCPay()
 bc_pay.register_app(bc_app)
 
 bc_query = BCQuery()
 bc_query.register_app(bc_app)
-
-wx_appid = "wx419f04c4a731303d";
-wx_app_secret = "21e4b4593ddd200dd77c751f4b964963";
-redirect_url = "http://pythondemo.beecloud.cn/bill"
 
 @app.route('/')
 def hello_index():
@@ -326,5 +332,5 @@ def format_utc_time(s):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='localhost', port=80)
+    app.run(host='pythondemo.beecloud.cn', port=80)
 #app.run()
