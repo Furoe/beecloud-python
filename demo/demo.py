@@ -15,6 +15,7 @@ from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelT
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
     BCTransferRedPack
 
+import json
 app = Flask(__name__)
 
 # init
@@ -31,7 +32,7 @@ bc_app.app_secret = '9e0ef79d-eb62-4760-b125-cb0684127526'
 # bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
 bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 wx_appid = "wx119a2bda81854ae0";
-wx_app_secret = "21e4b4593ddd200dd77c751f4b964963";
+wx_app_secret = "53e3943476118a3dff21fb95848de6d7";
 redirect_url = "http://pythondemo.beecloud.cn/bill"
 #jsapi测试参数结束
 
@@ -45,19 +46,21 @@ bc_query.register_app(bc_app)
 def hello_index():
     return app.send_static_file('index.html')
 
-@app.route('/bill', methods=['POST'])
+@app.route('/bill', methods=['POST', 'GET'])
 def app_bill():
-    channel = request.form['channel']
+    try:
+    	channel = request.form['channel']
+    except:
+        channel = request.args.get('channel')
     if channel.startswith('PAYPAL'):
         return _deal_with_international_pay(channel)
     elif channel == 'WX_JSAPI':
         code = request.args.get('code', '');
         if not code:
             oauth_url = fetch_code(wx_appid, redirect_url + '?channel=' + channel)
-            print oauth_url
             return redirect(oauth_url)
         else:
-            open_id = fetch_open_id(wx_appid, wx_app_secret, wx_app_secret)
+            open_id = fetch_open_id(wx_appid, wx_app_secret, code)
             return _deal_with_normal_pay(channel, open_id)
     else:
         return _deal_with_normal_pay(channel, '')
@@ -78,6 +81,8 @@ def _deal_with_normal_pay(channel, open_id):
     # 支付宝内嵌二维码支付(ALI_QRCODE)的必填参数
     if req_params.channel == BCChannelType.ALI_QRCODE:
         req_params.qr_pay_mode = '0'
+    if req_params.channel == BCChannelType.WX_JSAPI and open_id:
+	req_params.openid = open_id
     resp = bc_pay.pay(req_params)
 
     if resp.result_code:
@@ -93,13 +98,14 @@ def _deal_with_normal_pay(channel, open_id):
         return render_template('blank.html', content=Markup(resp.html))
     elif req_params.channel == BCChannelType.WX_JSAPI:
         jsapi = {}
-        jsapi['timeStamp'] = resp['timestamp']
-        jsapi['appId'] = resp['app_id']
-        jsapi['nonceStr'] = resp['nonce_str']
-        jsapi['package'] = resp['package']
-        jsapi['signType'] = resp['sign_type']
-        jsapi['paySign'] = resp['pay_sign']
-        return render_template('jsapi.html', jsapi = jsapi)
+        jsapi['timeStamp'] = resp.timestamp
+        jsapi['appId'] = resp.app_id
+        jsapi['nonceStr'] = resp.nonce_str
+        jsapi['package'] = resp.package
+        jsapi['signType'] = resp.sign_type
+        jsapi['paySign'] = resp.pay_sign
+	print resp.app_id, resp.nonce_str, resp.timestamp, resp.package, resp.sign_type, resp.pay_sign
+        return render_template('jsapi.html', jsapi = json.dumps(jsapi))
 
 
 def _deal_with_international_pay(channel):

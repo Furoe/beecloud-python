@@ -221,6 +221,7 @@ def fetch_open_id(wx_app_id, wx_app_secret, code):
     http_response = requests.get(url)
     if http_response.status_code == 200:
         resp_dict = http_response.json()
+	print resp_dict
         return resp_dict['openid']
     else:
         return ''
