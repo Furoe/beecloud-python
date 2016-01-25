@@ -82,7 +82,7 @@ def _deal_with_normal_pay(channel, open_id):
     if req_params.channel == BCChannelType.ALI_QRCODE:
         req_params.qr_pay_mode = '0'
     if req_params.channel == BCChannelType.WX_JSAPI and open_id:
-	req_params.openid = open_id
+        req_params.openid = open_id
     resp = bc_pay.pay(req_params)
 
     if resp.result_code:
@@ -104,8 +104,8 @@ def _deal_with_normal_pay(channel, open_id):
         jsapi['package'] = resp.package
         jsapi['signType'] = resp.sign_type
         jsapi['paySign'] = resp.pay_sign
-	print resp.app_id, resp.nonce_str, resp.timestamp, resp.package, resp.sign_type, resp.pay_sign
-    return render_template('jsapi.html', jsapi = json.dumps(jsapi))
+        print resp.app_id, resp.nonce_str, resp.timestamp, resp.package, resp.sign_type, resp.pay_sign
+        return render_template('jsapi.html', jsapi = json.dumps(jsapi))
 
 
 def _deal_with_international_pay(channel):
