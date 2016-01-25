@@ -19,9 +19,9 @@ app = Flask(__name__)
 
 # init
 bc_app = BCApp()
-bc_app.is_test_mode = True
+# bc_app.is_test_mode = True
 bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
-# bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
 # bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
 bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
