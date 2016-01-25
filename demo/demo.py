@@ -14,8 +14,8 @@ from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, f
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
     BCTransferRedPack
-
 import json
+
 app = Flask(__name__)
 
 # init
@@ -105,7 +105,7 @@ def _deal_with_normal_pay(channel, open_id):
         jsapi['signType'] = resp.sign_type
         jsapi['paySign'] = resp.pay_sign
 	print resp.app_id, resp.nonce_str, resp.timestamp, resp.package, resp.sign_type, resp.pay_sign
-        return render_template('jsapi.html', jsapi = json.dumps(jsapi))
+    return render_template('jsapi.html', jsapi = json.dumps(jsapi))
 
 
 def _deal_with_international_pay(channel):
