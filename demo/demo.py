@@ -13,7 +13,7 @@ from beecloud.query import BCQuery
 from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
-    BCTransferRedPack
+    BCTransferRedPack, BCCardTransferParams
 import json
 
 app = Flask(__name__)
@@ -23,14 +23,14 @@ bc_app = BCApp()
 # bc_app.is_test_mode = True
 bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
 bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
-# bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
-bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
+bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+# bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
-#以下是jsapi的测试参数
-wx_appid = "wx119a2bda81854ae0";
-wx_app_secret = "53e3943476118a3dff21fb95848de6d7";
+# 以下是jsapi的测试参数
+wx_appid = "wx119a2bda81854ae0"
+wx_app_secret = "53e3943476118a3dff21fb95848de6d7"
 redirect_url = "http://pythondemo.beecloud.cn/bill"
-#jsapi测试参数结束
+# jsapi测试参数结束
 
 bc_pay = BCPay()
 bc_pay.register_app(bc_app)
@@ -38,20 +38,22 @@ bc_pay.register_app(bc_app)
 bc_query = BCQuery()
 bc_query.register_app(bc_app)
 
+
 @app.route('/')
 def hello_index():
     return app.send_static_file('index.html')
 
+
 @app.route('/bill', methods=['POST', 'GET'])
 def app_bill():
     try:
-    	channel = request.form['channel']
+        channel = request.form['channel']
     except:
         channel = request.args.get('channel')
     if channel.startswith('PAYPAL'):
         return _deal_with_international_pay(channel)
     elif channel == 'WX_JSAPI':
-        code = request.args.get('code', '');
+        code = request.args.get('code', '')
         if not code:
             oauth_url = fetch_code(wx_appid, redirect_url + '?channel=' + channel)
             return redirect(oauth_url)
@@ -100,8 +102,8 @@ def _deal_with_normal_pay(channel, open_id):
         jsapi['package'] = resp.package
         jsapi['signType'] = resp.sign_type
         jsapi['paySign'] = resp.pay_sign
-        print resp.app_id, resp.nonce_str, resp.timestamp, resp.package, resp.sign_type, resp.pay_sign
-        return render_template('jsapi.html', jsapi = json.dumps(jsapi))
+        # print(json.dumps(jsapi))
+        return render_template('jsapi.html', jsapi=json.dumps(jsapi))
 
 
 def _deal_with_international_pay(channel):
@@ -291,6 +293,34 @@ def app_transfer():
         transfer_params.transfer_data = [item1, item2]
 
         result = bc_pay.batch_transfer(transfer_params)
+    elif channel == 'BC_TRANSFER':  # 比可代付
+        transfer_params = BCCardTransferParams()
+        # 单位为分
+        transfer_params.total_fee = 1
+        transfer_params.bill_no = order_num_on_datetime()
+        # 最长支持16个汉字
+        transfer_params.title = u'python比可代付测试'
+        # 银行缩写编码
+        transfer_params.bank_code = 'BOC'
+        # 银行联行行号
+        transfer_params.bank_associated_code = '1043050000'
+        # 银行全名
+        transfer_params.bank_fullname = u'中国银行'
+        # DE代表借记卡，CR代表信用卡
+        transfer_params.card_type = 'DE'
+        # 帐户类型，P代表私户，C代表公户
+        transfer_params.account_type = 'C'
+        # 收款方的银行卡号
+        transfer_params.account_no = '5300000'
+        # 收款方的姓名或者单位名
+        transfer_params.account_name = u'苏州比可网络科技有限公司'
+        # 银行绑定的手机号，当需要手机收到银行入账信息时，该值必填，前提是该手机在银行有短信通知业务，否则收不到银行信息
+        transfer_params.mobile = '1850000'
+        # 附加数据，选填
+        transfer_params.optional = {'key1': u'选填的value'}
+
+        result = bc_pay.bc_transfer(transfer_params)
+
     else:   # 单笔打款
         transfer_params = BCTransferReqParams()
         transfer_params.channel = channel
@@ -334,5 +364,5 @@ def format_utc_time(s):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='pythondemo.beecloud.cn', port=80)
-#app.run()
+    # app.run(host='pythondemo.beecloud.cn', port=80)
+    app.run()

@@ -17,6 +17,7 @@ class _OrderType:
     BILL = 0
     REFUND = 1
 
+
 class BCQuery:
     def __init__(self):
         self.bc_app = None

@@ -193,8 +193,11 @@ def attach_app_sign(req_param, req_type, bc_app):
             else:
                 req_param.app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
                                                   bc_app.app_secret).encode('UTF-8')).hexdigest()
+
 wx_oauth_url_basic = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
 wx_sns_token_url_basic = 'https://api.weixin.qq.com/sns/oauth2/access_token?'
+
+
 # 获取code 的url生成规则，redirect_url是微信用户登录后的回调页面，将会有code的返回
 def fetch_code(wx_app_id, redirect_url):
     code_data = {}
@@ -203,8 +206,12 @@ def fetch_code(wx_app_id, redirect_url):
     code_data['response_type'] = 'code'
     code_data['scope'] = 'snsapi_base'
     code_data['state'] = 'STATE#wechat_redirect'
-    params = urllib.urlencode(code_data)
+    if sys.version_info[0] == 3:
+        params = urllib.parse.urlencode(code_data)
+    else:
+        params = urllib.urlencode(code_data)
     return wx_oauth_url_basic + params
+
 
 # 获取openid的url生成方法
 def create_fetch_open_id_url(wx_app_id, wx_app_secret, code):
@@ -213,15 +220,18 @@ def create_fetch_open_id_url(wx_app_id, wx_app_secret, code):
     fetch_data['secret'] = wx_app_secret
     fetch_data['grant_type'] = 'authorization_code'
     fetch_data['code'] = code
-    params = urllib.urlencode(fetch_data)
+    if sys.version_info[0] == 3:
+        params = urllib.parse.urlencode(fetch_data)
+    else:
+        params = urllib.urlencode(fetch_data)
     return wx_sns_token_url_basic + params
+
 
 def fetch_open_id(wx_app_id, wx_app_secret, code):
     url = create_fetch_open_id_url(wx_app_id, wx_app_secret, code)
     http_response = requests.get(url)
     if http_response.status_code == 200:
         resp_dict = http_response.json()
-        return resp_dict['openid']
+        return resp_dict.get('openid')
     else:
         return ''
-

@@ -13,7 +13,8 @@ from beecloud import NETWORK_ERROR_CODE, NETWORK_ERROR_NAME, NOT_SUPPORTED_CODE
 from beecloud.utils import URL_REQ_SUCC, URL_REQ_FAIL, order_num_on_datetime
 from beecloud.pay import BCPay
 from beecloud.entity import BCApp, BCResult, BCPayReqParams, BCChannelType, BCRefundReqParams, BCPreRefundAuditParams, \
-    BCTransferRedPack, BCTransferReqParams, BCBatchTransferItem, BCBatchTransferParams, BCInternationalPayParams
+    BCTransferRedPack, BCTransferReqParams, BCBatchTransferItem, BCBatchTransferParams, BCInternationalPayParams, \
+    BCCardTransferParams
 
 
 class PayTestCase(unittest.TestCase):
@@ -181,6 +182,50 @@ class PayTestCase(unittest.TestCase):
         redpack.act_name = u'BeeCloud开发者测试中'
         transfer_params.redpack_info = redpack
         result = self.bc_pay.transfer(transfer_params)
+        assert result.result_code == 0
+        assert result.result_msg == 'OK'
+        assert result.err_detail == ''
+
+    @mock.patch('beecloud.pay.http_post')
+    def test_bc_transfer(self, mock_post):
+        # err case
+        self._inner_test_http_err_case(mock_post, BCCardTransferParams(), self.bc_pay.bc_transfer)
+
+        # if test mode
+        self.bc_app.is_test_mode = True
+        self.bc_app.test_secret = 'your_test_sec'
+        result = self.bc_pay.bc_transfer(BCCardTransferParams())
+        assert result.result_code == NOT_SUPPORTED_CODE
+        # print(result.err_detail)
+
+        # succ case
+        self.bc_app.is_test_mode = None   # or False
+
+        resp_dict = {'result_msg': 'OK', 'err_detail': '', 'result_code': 0}
+        mock_post.return_value = URL_REQ_SUCC, resp_dict
+
+        transfer_params = BCCardTransferParams()
+        transfer_params.total_fee = 1
+        transfer_params.bill_no = order_num_on_datetime()
+        # 最长支持16个汉字
+        transfer_params.title = u'python比可代付测试'
+        # 银行缩写编码
+        transfer_params.bank_code = 'BOC'
+        # 银行联行行号
+        transfer_params.bank_associated_code = '12345678'
+        # 银行全名
+        transfer_params.bank_fullname = u'中国银行'
+        # DE代表借记卡，CR代表信用卡
+        transfer_params.card_type = 'DE'
+        # 帐户类型，P代表私户，C代表公户
+        transfer_params.account_type = 'C'
+        # 收款方的银行卡号
+        transfer_params.account_no = '5300000'
+        # 收款方的姓名或者单位名
+        transfer_params.account_name = u'苏州比可网络科技有限公司'
+        # 银行绑定的手机号，当需要手机收到银行入账信息时，该值必填，前提是该手机在银行有短信通知业务，否则收不到银行信息
+        transfer_params.mobile = '1850000'
+        result = self.bc_pay.bc_transfer(transfer_params)
         assert result.result_code == 0
         assert result.result_msg == 'OK'
         assert result.err_detail == ''

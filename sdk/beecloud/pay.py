@@ -39,6 +39,9 @@ class BCPay:
     def _bill_transfer_url(self):
         return get_random_host() + 'rest/transfer'
 
+    def _bc_transfer_url(self):
+        return get_random_host() + 'rest/bc_transfer'
+
     def _batch_transfer_url(self):
         return get_random_host() + 'rest/transfers'
 
@@ -173,10 +176,21 @@ class BCPay:
 
         return bc_result
 
+    def bc_transfer(self, transfer_params):
+        """
+        for BeeCloud transfer via bank card
+        refer to https://beecloud.cn/doc/?index=2
+        :param transfer_params: beecloud.entity.BCCardTransferParams
+        :return: beecloud.entity.BCResult
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('bc_transfer')
+        return self._bill_transfer(self._bc_transfer_url(), transfer_params)
+
     def transfer(self, transfer_params):
         """
         for WX_REDPACK, WX_TRANSFER, ALI_TRANSFER
-        refer to https://github.com/beecloud/beecloud-rest-api/tree/master/transfer #1
+        refer to https://beecloud.cn/doc/?index=2
         redpack_info should be type of beecloud.entity.BCTransferRedPack
         :param transfer_params: beecloud.entity.BCTransferReqParams
         :return: beecloud.entity.BCResult
@@ -188,7 +202,7 @@ class BCPay:
     def batch_transfer(self, transfer_params):
         """
         batch transfer, currently only ALI is supported
-        refer to https://github.com/beecloud/beecloud-rest-api/tree/master/transfer #2
+        refer to https://beecloud.cn/doc/?index=2
         transfer_data should be type of beecloud.entity.BCBatchTransferItem
         :param transfer_params: beecloud.entity.BCBatchTransferParams
         :return: beecloud.entity.BCResult

@@ -318,6 +318,49 @@ class BCTransferRedPack:
         self.act_name = None
 
 
+# 用于bc_transfer
+class BCCardTransferParams:
+    def __init__(self):
+        # 下发订单总金额，正整数
+        self.total_fee = None
+
+        # 商户订单号
+        self.bill_no = None
+
+        # 下发订单标题
+        self.title = None
+
+        # 交易源
+        self.trade_source = 'OUT_PC'
+
+        # 银行编码
+        self.bank_code = None
+
+        # 银行联行行号
+        self.bank_associated_code = None
+
+        # 银行全名
+        self.bank_fullname = None
+
+        # 银行卡类型，DE代表借记卡，CR代表信用卡
+        self.card_type = None
+
+        # 收款帐户类型
+        self.account_type = None
+
+        # 收款帐户号
+        self.account_no = None
+
+        # 收款帐户名称
+        self.account_name = None
+
+        # 银行绑定的手机号
+        self.mobile = None
+
+        # 附加数据，Map类型
+        self.optional = None
+
+
 class BCBatchTransferParams:
     def __init__(self):
         # 渠道类型 目前只支持ALI
