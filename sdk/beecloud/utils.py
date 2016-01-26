@@ -18,6 +18,7 @@ import requests.exceptions
 import sys
 import hashlib
 import time
+import json
 
 if sys.version_info[0] == 3:   # if 3
     import urllib.parse
@@ -89,14 +90,10 @@ def http_put(url, obj, timeout=None):
 
 
 def obj_to_quote_str(param_obj):
+    str_tmp = json.dumps(obj_to_dict(param_obj))
     if sys.version_info[0] == 3:
-        str_tmp = str(obj_to_dict(param_obj))
         return urllib.parse.quote_plus(str_tmp)
     else:
-        # for py2, str({'a':u'a'}) would be "{'a': u'a'}", so encode dict value
-        tmp_dict = {k: v.encode('UTF-8') if isinstance(v, unicode) else v
-                    for (k, v) in param_obj.__dict__.items() if v is not None}
-        str_tmp = str(tmp_dict)
         return urllib.quote_plus(str_tmp)
 
 
