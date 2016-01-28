@@ -21,8 +21,11 @@
 
 ## 依赖
 sdk依赖于开源库[requests](http://docs.python-requests.org/en/latest/)，安装sdk时会自动安装，如果意外安装失败，可以手动安装
+
 `pip install requests`
+
 demo依赖于开源web框架[Flask](http://flask.pocoo.org/)，需手动安装
+
 `pip install Flask`
 
 ## 准备工作
@@ -33,7 +36,7 @@ demo依赖于开源web框架[Flask](http://flask.pocoo.org/)，需手动安装
 * 具体使用请参考项目中的`demo`代码；
 * 关于字符串的说明，对于`python2`如果需要传入的参数包含中文字符，请传入`unicode`，对于网络请求成功的情况，`BCResult`中返回结果的字符串也是`unicode`形式；对于`python3`，不需要考虑这样的细节；
 * 以下的示例和`demo`中出现的关键字`u`（`unicode`）是为了兼容处理，在`python3`环境下不需要作这样的处理；
-* 关于请求参数，公用字段（`app_id`，`timestamp`，`app_sign`）会自动处理，不要手动设置，其他字段和`REST API`一致（例如`REST API`中支付部分，对于`WX_JSAPI`支付方式，`openid`是必填的，假设请求参数名为`req_params`，那么应该添加这样的设置 `req_params.openid = 'openid_str'`），请参考[官网](https://beecloud.cn/doc/?index=0)说明，打款和境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
+* 关于请求参数，公用字段（`app_id`，`timestamp`，`app_sign`）会自动处理，不要手动设置，其他字段和`REST API`一致（例如`REST API`中支付部分，对于`WX_JSAPI`支付方式，`openid`是必填的，假设请求参数名为`req_params`，那么应该添加这样的设置 `req_params.openid = 'openid_str'`），请参考[官网](https://beecloud.cn/doc/?index=0)说明，境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
 * 返回结果是`beecloud.entity.BCResult`实例，包含以下公共字段，其他字段因不同API而异（例如`REST API`中支付部分，支付完成后会返回支付表记录唯一标识`id`，假设返回参数名为`result`，可以通过`result.id`获取结果），同理，请参照上一条列出的文档
 
 参数名 | 说明
@@ -97,7 +100,7 @@ req_params.bill_no = 'billno123'
 req_params.optional = {'lang': 'python', u'中文key': u'中文value'}
 # 支付完成后的跳转页面
 req_params.return_url = 'https://beecloud.cn/'
-如果result = bc_pay.pay(req_params)
+result = bc_pay.pay(req_params)
 # 如果result.result_code为0表示请求成功
 # 然后对相关的返回参数做处理，比如ALI_WEB会返回重定向url
 ```
@@ -151,6 +154,7 @@ result = bc_pay.audit_pre_refunds(req_params)
 #### 原型：
 打款分`单笔打款`和`批量打款`；<br/>
 `单笔打款`包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；<br/>
+`比可银行卡代付`通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起代付；<br/>
 `批量打款`目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 
 #### 调用：
@@ -174,6 +178,37 @@ transfer_params.redpack_info = redpack
 result = bc_pay.transfer(transfer_params)
 # result.result_code等于0表示打款成功
 # 对于支付宝需要重定向到result.url
+```
+
+* 比可银行卡代付
+```python
+transfer_params = BCCardTransferParams()
+# 单位为分
+transfer_params.total_fee = 1
+transfer_params.bill_no = order_num_on_datetime()
+# 最长支持16个汉字
+transfer_params.title = u'python比可代付测试'
+# 银行缩写编码
+transfer_params.bank_code = 'BOC'
+# 银行联行行号
+transfer_params.bank_associated_code = '1043050000'
+# 银行全名
+transfer_params.bank_fullname = u'中国银行'
+# DE代表借记卡，CR代表信用卡
+transfer_params.card_type = 'DE'
+# 帐户类型，P代表私户，C代表公户
+transfer_params.account_type = 'C'
+# 收款方的银行卡号
+transfer_params.account_no = '5300000'
+# 收款方的姓名或者单位名
+transfer_params.account_name = u'苏州比可网络科技有限公司'
+# 银行绑定的手机号，当需要手机收到银行入账信息时，该值必填，前提是该手机在银行有短信通知业务，否则收不到银行信息
+transfer_params.mobile = '1850000'
+# 附加数据，选填
+transfer_params.optional = {'key1': u'选填的value'}
+
+result = bc_pay.bc_transfer(transfer_params)
+# result.result_code等于0表示代付请求成功，但是需要在webhook判定最终代付结果
 ```
 
 * 批量打款
