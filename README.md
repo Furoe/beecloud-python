@@ -171,7 +171,7 @@ result = bc_pay.audit_pre_refunds(req_params)
  * **批量打款**目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 
 #### 调用：
-##### 单笔打款
+***单笔打款***  
 以微信红包为例
 
 ```python
@@ -193,8 +193,8 @@ result = bc_pay.transfer(transfer_params)
 # result.result_code等于0表示打款成功
 # 对于支付宝需要重定向到result.url
 ```
-
-##### 比可银行卡代付
+  
+***比可银行卡代付***
 
 ```python
 transfer_params = BCCardTransferParams()
@@ -225,8 +225,8 @@ transfer_params.optional = {'key1': u'选填的value'}
 result = bc_pay.bc_transfer(transfer_params)
 # result.result_code等于0表示代付请求成功，但是需要在webhook判定最终代付结果
 ```
-
-##### 批量打款
+  
+***批量打款***
 
 ```python
 transfer_params = BCBatchTransferParams()
