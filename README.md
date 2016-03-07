@@ -10,7 +10,6 @@
 
 
 ## 安装 Python SDK
-
 从pip快速安装  
 `pip install beecloud`  
 更新  
@@ -22,11 +21,15 @@
 ## 依赖
 sdk依赖于开源库[requests](http://docs.python-requests.org/en/latest/)，安装sdk时会自动安装，如果意外安装失败，可以手动安装
 
-`pip install requests`
+```
+pip install requests
+```
 
 demo依赖于开源web框架[Flask](http://flask.pocoo.org/)，需手动安装
 
-`pip install Flask`
+```
+pip install Flask
+```
 
 ## 准备工作
 1. 注册开发者：猛击[这里](http://www.beecloud.cn/register)注册成为BeeCloud开发者。
@@ -45,10 +48,11 @@ result_code | 返回码，0为正常
 result_msg | 返回信息， OK为正常
 err_detail | 具体错误信息
 
-### 1. 初始化
-1. `BCApp`对应于`BeeCloud`控制台中的应用，初始化：
+### 1.初始化
 
-```python
+#### ①. `BCApp`对应于`BeeCloud`控制台中的应用，初始化：  
+
+```
 from beecloud.entity import BCApp
 bc_app = BCApp()
 bc_app.app_id = 'your app id'
@@ -57,8 +61,10 @@ bc_app.app_secret = 'your app secret'
 # master secret被用于打款和退款
 bc_app.master_secret = 'your app master secret'
 ```
+
 如果相关渠道尚未申请完成，想要体验sdk支付流程，可以开启测试模式
-```python
+
+```
 from beecloud.entity import BCApp
 bc_app = BCApp()
 # 不要在上线模式中设置该选项，否则会遇到BC验签错误相关提示
@@ -66,15 +72,17 @@ app.is_test_mode = True
 bc_app.app_id = 'your app id'
 bc_app.test_secret = 'your app test secret'
 ```
-<br/>
-2. 对于支付、打款和退款，需要初始化BCPay：
+
+#### ②. 对于支付、打款和退款，需要初始化BCPay：
+
 ```python
 from beecloud.pay import BCPay
 bc_pay = BCPay()
 bc_pay.register_app(bc_app)
 ```
-<br/>
-3. 对于查询需要初始化BCQuery：
+
+#### ③. 对于查询需要初始化BCQuery：
+
 ```python
 from beecloud.query import BCQuery
 bc_query = BCQuery()
@@ -114,6 +122,7 @@ result = bc_pay.pay(req_params)
 通过`BCPay`的实例，以`refund`方法，结合`BCRefundReqParams`参数，发起退款请求
 
 #### 调用：
+
 ```python
 refund_params = BCRefundReqParams()
 # 退款channel为选填参数
@@ -137,6 +146,7 @@ result = bc_pay.refund(refund_params)
 通过`BCPay`的实例，以`audit_pre_refunds`方法，结合`BCPreRefundAuditParams`参数，发起预退款批量审核
 
 #### 调用：
+
 ```python
 req_params = BCPreRefundAuditParams()
 req_params.channel = 'WX'
@@ -152,14 +162,18 @@ result = bc_pay.audit_pre_refunds(req_params)
 可以参考`demo.py`中`app_transfer`
 
 #### 原型：
-打款分`单笔打款`和`批量打款`；<br/>
-`单笔打款`包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；<br/>
-`比可银行卡代付`通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起代付；<br/>
-`批量打款`目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
+打款分**单笔打款**、**比可银行卡代付**、**批量打款**；  
+
+ * **单笔打款**包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；  
+
+ * **比可银行卡代付**通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起代付；
+  
+ * **批量打款**目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 
 #### 调用：
-* 单笔打款
+***单笔打款***  
 以微信红包为例
+
 ```python
 transfer_params = BCTransferReqParams()
 transfer_params.channel = 'WX_REDPACK'
@@ -179,8 +193,9 @@ result = bc_pay.transfer(transfer_params)
 # result.result_code等于0表示打款成功
 # 对于支付宝需要重定向到result.url
 ```
+  
+***比可银行卡代付***
 
-* 比可银行卡代付
 ```python
 transfer_params = BCCardTransferParams()
 # 单位为分
@@ -210,8 +225,9 @@ transfer_params.optional = {'key1': u'选填的value'}
 result = bc_pay.bc_transfer(transfer_params)
 # result.result_code等于0表示代付请求成功，但是需要在webhook判定最终代付结果
 ```
+  
+***批量打款***
 
-* 批量打款
 ```python
 transfer_params = BCBatchTransferParams()
 # 11-32位数字字母组合
@@ -384,7 +400,7 @@ Pull Request要求
 - 清晰的commit历史 - 保证你的pull请求的每次commit操作都是有意义的。如果你开发中需要执行多次的即时commit操作，那么请把它们放到一起再提交pull请求。
 
 ## 联系我们
-- 如果有什么问题，可以到BeeCloud开发者1群:**321545822** 或 BeeCloud开发者2群:**427128840** 或 BeeCloud开发者3群:**102350518**提问
+- 如果有什么问题，可以到BeeCloud开发者②群:**427128840** 或 BeeCloud开发者⑤群:**532516744**提问
 - 更详细的文档，见源代码的注释以及[官方文档](https://beecloud.cn/doc/?index=5)
 - 如果发现了bug，欢迎提交[issue](https://github.com/beecloud/beecloud-python/issues)
 - 如果有新的需求，欢迎提交[issue](https://github.com/beecloud/beecloud-python/issues)
