@@ -83,6 +83,8 @@ class BCChannelType:
     BD_WAP = 'BD_WAP'
     BD_WEB = 'BD_WEB'
 
+    BC_GATEWAY = 'BC_GATEWAY'
+
 
 class BCReqType:
     PAY = 0
@@ -443,3 +445,7 @@ class BCPayPalCreditCard:
 
         # 卡类别
         self.card_type = None
+
+
+class _TmpObject:
+    pass

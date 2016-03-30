@@ -67,9 +67,14 @@ def app_bill():
 def _deal_with_normal_pay(channel, open_id):
     # wx js api 需要先获取支付人的open id
     req_params = BCPayReqParams()
+
+    # 当channel为BC_GATEWAY时，bank必填
+    if channel == 'BC_GATEWAY':
+        req_params.bank = 'CMB'
+
     req_params.channel = channel
     req_params.title = u'python {:s} 支付测试'.format(channel)
-    req_params.total_fee = 1
+    req_params.total_fee = 2
     req_params.bill_no = order_num_on_datetime()
     req_params.optional = {'lang': 'python', u'中文key': u'中文value'}
     # 支付完成后的跳转页面
@@ -365,4 +370,4 @@ def format_utc_time(s):
 if __name__ == '__main__':
     app.debug = True
     # app.run(host='pythondemo.beecloud.cn', port=80)
-    app.run()
+    app.run(host='0.0.0.0')

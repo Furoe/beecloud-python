@@ -59,7 +59,7 @@
                 <a href="/refund?bill_no={{ bill.bill_no }}&channel={{ bill.channel }}&refund_fee={{ bill.total_fee }}" target="_blank">退款</a>
                 {% endif %}
             </td>
-            <td>{% if not bill.refund_result %}
+            <td>{% if not bill.refund_result and bill.sub_channel != 'BC_GATEWAY'%}
                 <a href="/refund?bill_no={{ bill.bill_no }}&channel={{ bill.channel }}&refund_fee={{ bill.total_fee }}&need_approval=True" target="_blank">预退款</a>
                 {% endif %}
             </td>
