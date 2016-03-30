@@ -45,6 +45,9 @@ class BCPay:
     def _batch_transfer_url(self):
         return get_random_host() + 'rest/transfers'
 
+    def _withhold_url(self):
+        return get_random_host() + 'rest/finance/bill'
+
     def pay(self, pay_params):
         """
         payment API, different channels have different requirements for request params
@@ -250,3 +253,138 @@ class BCPay:
             bc_result.credit_card_id = resp_dict.get('credit_card_id')
 
         return bc_result
+
+    def withhold(self, params):
+        """
+        get money from signed user bank account
+        :param params: beecloud.entity.BCWithholdParams
+        :return: beecloud.entity.BCResult, which contains withhold id
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('withhold')
+
+        attach_app_sign(params, BCReqType.PAY, self.bc_app)
+        tmp_resp = http_post(self._withhold_url(), params, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.id = resp_dict.get('id')
+
+        return bc_result
+
+
+class BCAuth:
+    def __init__(self):
+        self.bc_app = None
+
+    def register_app(self, bc_app):
+        """
+        register app, which is mandatory before calling other API
+        :param bc_app: beecloud.entity.BCApp
+        """
+        self.bc_app = bc_app
+
+    def _verify_bank_account_url(self):
+        return get_random_host() + 'rest/finance/account'
+
+    def _sign_bank_account_url(self):
+        return get_random_host() + 'rest/finance/user'
+
+    def _sms_passcode_url(self):
+        return get_random_host() + 'rest/finance/sms'
+
+    def verify_bank_account(self, bank_account):
+        """
+        verify bank account
+        :param bank_account: beecloud.entity.BCBankAccount
+        :return: beecloud.entity.BCResult
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('verify_bank_account')
+
+        attach_app_sign(bank_account, BCReqType.AUTH, self.bc_app)
+        tmp_resp = http_post(self._verify_bank_account_url(), bank_account, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.is_valid_card = resp_dict.get('is_valid_card')
+
+        return bc_result
+
+    def sign_bank_account(self, bank_account):
+        """
+        sign bank account
+        :param bank_account: beecloud.entity.BCBankAccount
+        :return: beecloud.entity.BCResult, which contains signed user id
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('sign_bank_account')
+
+        attach_app_sign(bank_account, BCReqType.AUTH, self.bc_app)
+        tmp_resp = http_post(self._sign_bank_account_url(), bank_account, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.id = resp_dict.get('id')
+
+        return bc_result
+
+    def send_sms_passcode(self, user_id):
+        """
+        send sms verify code
+        :param user_id: get from sign_bank_account
+        :return: beecloud.entity.BCResult, which contains sms_id
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('send_sms_passcode')
+
+        tmp_obj = _TmpObject()
+        tmp_obj.user_id = user_id
+        attach_app_sign(tmp_obj, BCReqType.AUTH, self.bc_app)
+        tmp_resp = http_post(self._sms_passcode_url(), tmp_obj, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.sms_id = resp_dict.get('sms_id')
+
+        return bc_result
+
+
+class _TmpObject:
+    pass

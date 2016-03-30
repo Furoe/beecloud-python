@@ -8,7 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from beecloud.entity import BCResult, BCBill, BCRefund, BCReqType
+from beecloud.entity import BCResult, BCBill, BCRefund, BCReqType, BCWithhold
 from beecloud.utils import get_random_host, http_get, obj_to_quote_str, set_common_attr, \
     report_not_supported_err, attach_app_sign
 
@@ -16,6 +16,7 @@ from beecloud.utils import get_random_host, http_get, obj_to_quote_str, set_comm
 class _OrderType:
     BILL = 0
     REFUND = 1
+    WITHHOLD = 2
 
 
 class BCQuery:
@@ -38,6 +39,9 @@ class BCQuery:
     def _query_refunds_url(self):
         return 'rest/refunds'
 
+    def _query_withhold_bills_url(self):
+        return 'rest/finance/bills'
+
     def _query_bill_url(self):
         if self.bc_app.is_test_mode:
             return 'rest/sandbox/bill'
@@ -46,6 +50,9 @@ class BCQuery:
 
     def _query_refund_url(self):
         return 'rest/refund'
+
+    def _query_withhold_bill_url(self):
+        return 'rest/finance/bill'
 
     def _query_orders(self, query_params, query_type):
         if query_type == _OrderType.BILL:
@@ -121,6 +128,8 @@ class BCQuery:
             obj = BCBill()
         elif query_type == _OrderType.REFUND:
             obj = BCRefund()
+        elif query_type == _OrderType.WITHHOLD:
+            obj = BCWithhold()
         else:
             return None
 
@@ -266,6 +275,66 @@ class BCQuery:
 
         if not bc_result.result_code:
             bc_result.refund_status = resp_dict.get('refund_status')
+
+        return bc_result
+
+    def query_withhold_bills(self, query_params):
+        """
+        query withhold bills API
+        result contains a list(bills), its items are beecloud.entity.BCWithhold
+        :param query_params: beecloud.entity.BCQueryWithholdParams
+        :return: beecloud.entity.BCResult
+        """
+        attach_app_sign(query_params, BCReqType.QUERY, self.bc_app)
+        url = get_random_host() + self._query_withhold_bills_url() + '?para=' + obj_to_quote_str(query_params)
+
+        tmp_resp = http_get(url, self.bc_app.timeout)
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            order_dict_arr = resp_dict.get('bills')
+
+            orders = []
+            if order_dict_arr:
+                orders = [self._parse_dict_to_obj(order_dict, _OrderType.WITHHOLD)
+                          for order_dict in order_dict_arr]
+
+            bc_result.count = len(orders)
+
+            bc_result.bills = orders
+
+        return bc_result
+
+    def query_withhold_by_id(self, order_id):
+        """
+        query withhold bill by id API
+        :param order_id: withhold bill id
+        :return: beecloud.entity.BCResult
+        """
+        query_params = _TmpObject()
+        query_params.id = order_id
+        attach_app_sign(query_params, BCReqType.QUERY, self.bc_app)
+        url = get_random_host() + self._query_withhold_bill_url() + '?para=' + obj_to_quote_str(query_params)
+        tmp_resp = http_get(url, self.bc_app.timeout)
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            for k, v in resp_dict.items():
+                bc_result.__dict__[k] = v
 
         return bc_result
 

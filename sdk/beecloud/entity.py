@@ -89,6 +89,7 @@ class BCReqType:
     QUERY = 1
     REFUND = 2
     TRANSFER = 4
+    AUTH = 5
 
 
 class BCPayReqParams:
@@ -190,6 +191,27 @@ class BCQueryReqParams:
         self.limit = None
 
 
+class BCQueryWithholdParams:
+    def __init__(self):
+        # 订单是否成功
+        self.result = None
+
+        # 是只查该app，否查该email下所有，默认为true
+        self.app_limit = None
+
+        # 起始时间
+        self.start_time = None
+
+        # 结束时间
+        self.end_time = None
+
+        # 查询起始位置
+        self.skip = None
+
+        # 查询的条数
+        self.limit = None
+
+
 class BCResult:
     def __init__(self):
         self.result_code = None
@@ -277,6 +299,27 @@ class BCRefund:
 
         # 渠道详细信息
         self.message_detail = None
+
+
+class BCWithhold:
+    def __init__(self):
+        # 代扣记录id
+        self.id = None
+
+        # 商户订单号
+        self.bill_no = None
+
+        # 订单金额，单位为分
+        self.total_fee = None
+
+        # 扣款用户id
+        self.user_id = None
+
+        # 创建时间戳
+        self.createdat = None
+
+        # 订单是否成功
+        self.result = None
 
 
 class BCTransferReqParams:
@@ -443,3 +486,51 @@ class BCPayPalCreditCard:
 
         # 卡类别
         self.card_type = None
+
+
+class BCBankAccount:
+    def __init__(self):
+        # 用户银行卡账户名
+        self.bank_account_name = None
+
+        # 用户银行卡卡号
+        self.bank_account_no = None
+
+        # 用户银行名称
+        self.bank_name = None
+
+        # 银行预留手机号
+        self.mobile = None
+
+        # 银行所在省份
+        self.bank_province = None
+
+        # 银行所在城市
+        self.bank_city = None
+
+        # 身份证号
+        self.id_card_no = None
+
+
+class BCWithholdParams:
+    def __init__(self):
+        # 商户订单号
+        self.bill_no = None
+
+        # 签约用户id
+        self.user_id = None
+
+        # 收款方id
+        self.seller_id = None
+
+        # 短信印证码id
+        self.sms_id = None
+
+        # 短信验证码
+        self.sms_code = None
+
+        # 代扣金额，单位为分
+        self.total_fee = None
+
+        # 0为普通，1为加急
+        self.pay_type = None
