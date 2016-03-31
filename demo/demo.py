@@ -21,9 +21,9 @@ app = Flask(__name__)
 # init
 bc_app = BCApp()
 # bc_app.is_test_mode = True
-bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
-bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
-bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+bc_app.app_id = 'app_id'
+bc_app.app_secret = 'app_secret'
+bc_app.master_secret = 'master_secret'
 # bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
 # 以下是jsapi的测试参数
@@ -60,17 +60,23 @@ def app_bill():
         else:
             open_id = fetch_open_id(wx_appid, wx_app_secret, code)
             return _deal_with_normal_pay(channel, open_id)
+    elif channel == 'BC_GATEWAY':
+        bank = request.form.get('bank')
+        if not bank:
+            return app.send_static_file('choose_bank.html')
+        else:
+            return _deal_with_normal_pay('BC_GATEWAY', '', bank)
     else:
         return _deal_with_normal_pay(channel, '')
 
 
-def _deal_with_normal_pay(channel, open_id):
+def _deal_with_normal_pay(channel, open_id, bank=None):
     # wx js api 需要先获取支付人的open id
     req_params = BCPayReqParams()
 
     # 当channel为BC_GATEWAY时，bank必填
     if channel == 'BC_GATEWAY':
-        req_params.bank = 'CMB'
+        req_params.bank = bank
 
     req_params.channel = channel
     req_params.title = u'python {:s} 支付测试'.format(channel)
