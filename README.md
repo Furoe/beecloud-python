@@ -380,27 +380,3 @@ python demo.py
 
 ## 常见问题
 参见[FAQ](https://beecloud.cn/faq/)
-
-
-## 代码贡献
-我们非常欢迎大家来贡献代码，我们会向贡献者致以最诚挚的敬意。
-
-一般可以通过在Github上提交[Pull Request](https://github.com/beecloud/beecloud-python)来贡献代码。
-
-Pull Request要求
-
-- 代码规范 
-
-- 代码格式化 
-
-- 记得更新文档 - 保证`README.md`以及其他相关文档及时更新，和代码的变更保持一致性。
-
-- 一个feature提交一个pull请求 - 如果你的代码变更了多个操作，那就提交多个pull请求吧。
-
-- 清晰的commit历史 - 保证你的pull请求的每次commit操作都是有意义的。如果你开发中需要执行多次的即时commit操作，那么请把它们放到一起再提交pull请求。
-
-## 联系我们
-- 如果有什么问题，可以到BeeCloud开发者②群:**427128840** 或 BeeCloud开发者⑤群:**532516744**提问
-- 更详细的文档，见源代码的注释以及[官方文档](https://beecloud.cn/doc/?index=5)
-- 如果发现了bug，欢迎提交[issue](https://github.com/beecloud/beecloud-python/issues)
-- 如果有新的需求，欢迎提交[issue](https://github.com/beecloud/beecloud-python/issues)
