@@ -47,6 +47,12 @@ def app_accept_webhook():
 		return ''
 
 	# 如果一致第一个检验通过
+	'''
+	理论上说到这一步就可以
+	return 'success'
+	以下的业务逻辑请根据商户内部需求处理，
+	不需要重发了就应该返回success
+	'''
 
 	# 第二步：过滤重复的Webhook
 	'''
