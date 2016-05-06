@@ -6,7 +6,17 @@
 
 本项目的官方GitHub地址是 [https://github.com/beecloud/beecloud-python](https://github.com/beecloud/beecloud-python)
 
-本SDK是根据[BeeCloud Rest API](https://github.com/beecloud/beecloud-rest-api) 开发的 python SDK, 适用于python2.7、python3.4、python3.5。可以作为调用BeeCloud Rest API的示例或者直接用于生产。
+SDK支持以下支付渠道: 
+ 
+ * 微信
+ * 支付宝
+ * 银联
+ * PayPal
+ * 百度钱包   
+ * 京东
+ * 易宝、快钱等
+
+并且包含退款、打款和相应的查询功能，适用于python2.7、python3.4、python3.5。
 
 
 ## 安装 Python SDK
@@ -31,15 +41,14 @@ demo依赖于开源web框架[Flask](http://flask.pocoo.org/)，需手动安装
 pip install Flask
 ```
 
-## 准备工作
-1. 注册开发者：猛击[这里](http://www.beecloud.cn/register)注册成为BeeCloud开发者。
-2. 创建应用：使用注册的账号登陆[控制台](http://www.beecloud.cn/dashboard/)后，点击"+创建App"创建新应用
+## 准备
+参考[快速开始](https://beecloud.cn/apply/)，完成开发准备工作。
 
 ## 使用方法
 * 具体使用请参考项目中的`demo`代码；
 * 关于字符串的说明，对于`python2`如果需要传入的参数包含中文字符，请传入`unicode`，对于网络请求成功的情况，`BCResult`中返回结果的字符串也是`unicode`形式；对于`python3`，不需要考虑这样的细节；
 * 以下的示例和`demo`中出现的关键字`u`（`unicode`）是为了兼容处理，在`python3`环境下不需要作这样的处理；
-* 关于请求参数，公用字段（`app_id`，`timestamp`，`app_sign`）会自动处理，不要手动设置，其他字段和`REST API`一致（例如`REST API`中支付部分，对于`WX_JSAPI`支付方式，`openid`是必填的，假设请求参数名为`req_params`，那么应该添加这样的设置 `req_params.openid = 'openid_str'`），请参考[官网](https://beecloud.cn/doc/?index=0)说明，境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
+* 关于请求参数，公用字段（`app_id`，`timestamp`，`app_sign`）会自动处理，不要手动设置，其他字段和`REST API`一致（例如`REST API`中支付部分，对于`WX_JSAPI`支付方式，`openid`是必填的，假设请求参数名为`req_params`，那么应该添加这样的设置 `req_params.openid = 'openid_str'`），请参考[官网](https://beecloud.cn/doc/?index=rest-api)说明，境外支付请参考[Github beecloud-rest-api](https://github.com/beecloud/beecloud-rest-api/)，以下不做额外介绍
 * 返回结果是`beecloud.entity.BCResult`实例，包含以下公共字段，其他字段因不同API而异（例如`REST API`中支付部分，支付完成后会返回支付表记录唯一标识`id`，假设返回参数名为`result`，可以通过`result.id`获取结果），同理，请参照上一条列出的文档
 
 参数名 | 说明
@@ -243,11 +252,7 @@ item1.transfer_fee = 1
 item1.transfer_note = u'python支付宝批量打款item1'
 
 item2 = BCBatchTransferItem()
-item2.transfer_id = order_num_on_datetime() + 'b'
-item2.receiver_account = 'ali@account.c'
-item2.receiver_name = 'account2'
-item2.transfer_fee = 1
-item2.transfer_note = u'python支付宝批量打款item2'
+# 继续像item1一样添加相关设置
 
 transfer_params.transfer_data = [item1, item2]
 
@@ -379,4 +384,4 @@ python demo.py
 
 
 ## 常见问题
-参见[FAQ](https://beecloud.cn/faq/)
+参见[帮助中心](http://help.beecloud.cn/hc/) 
