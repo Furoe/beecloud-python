@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.0.0-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.1.0-blue.svg)
 
 ## 简介
 
@@ -171,11 +171,11 @@ result = bc_pay.audit_pre_refunds(req_params)
 可以参考`demo.py`中`app_transfer`
 
 #### 原型：
-打款分**单笔打款**、**比可银行卡代付**、**批量打款**；  
+打款分**单笔打款**、**比可企业打款**、**批量打款**；  
 
  * **单笔打款**包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；  
 
- * **比可银行卡代付**通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起代付；
+ * **比可企业打款**通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起打款；
   
  * **批量打款**目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 
@@ -203,7 +203,7 @@ result = bc_pay.transfer(transfer_params)
 # 对于支付宝需要重定向到result.url
 ```
   
-***比可银行卡代付***
+***比可企业打款***
 
 ```python
 transfer_params = BCCardTransferParams()
@@ -211,7 +211,7 @@ transfer_params = BCCardTransferParams()
 transfer_params.total_fee = 1
 transfer_params.bill_no = order_num_on_datetime()
 # 最长支持16个汉字
-transfer_params.title = u'python比可代付测试'
+transfer_params.title = u'python比可企业打款测试'
 # 银行缩写编码
 transfer_params.bank_code = 'BOC'
 # 银行联行行号
@@ -232,7 +232,7 @@ transfer_params.mobile = '1850000'
 transfer_params.optional = {'key1': u'选填的value'}
 
 result = bc_pay.bc_transfer(transfer_params)
-# result.result_code等于0表示代付请求成功，但是需要在webhook判定最终代付结果
+# result.result_code等于0表示打款请求成功，但是需要在webhook判定最终打款结果
 ```
   
 ***批量打款***

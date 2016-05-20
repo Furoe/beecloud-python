@@ -8,7 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from beecloud.entity import BCResult, BCBill, BCRefund, BCReqType
+from beecloud.entity import BCResult, BCBill, BCRefund, BCReqType, _TmpObject
 from beecloud.utils import get_random_host, http_get, obj_to_quote_str, set_common_attr, \
     report_not_supported_err, attach_app_sign
 
@@ -268,7 +268,3 @@ class BCQuery:
             bc_result.refund_status = resp_dict.get('refund_status')
 
         return bc_result
-
-
-class _TmpObject:
-    pass

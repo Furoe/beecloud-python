@@ -1,5 +1,9 @@
 BeeCloud Python Changelog
 =============================
+v3.1.0 发布日期：2016年5月20日
++ BeeCloud网关支付
++ BeeCloud快捷支付
+
 v3.0.0 发布日期：2016年1月15日
 本次更新比较大，API不兼容v2版本，具体使用查看readme
 
