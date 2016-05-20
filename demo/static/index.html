@@ -85,7 +85,7 @@
 <form method="post" action="/bill" target="_blank" style="width:85%;margin: 0 auto;">
     <div>
         <p style="text-align:left; font-size:1.5em; margin-left:1em; margin-top:2em; margin-bottom:0.5em">
-            选择以下平台，支付<b>1分钱</b></p>
+            选择以下平台，支付<b>2分钱</b></p>
         <ul class="clear" style="margin-top:20px">
             <li class="clicked" onclick="switch_img(this)">
                 <input type="radio" value="ALI_WEB" name="channel" checked="checked">
@@ -150,6 +150,14 @@
             <li onclick="switch_img(this)">
                 <input type="radio" value="PAYPAL_PAYPAL" name="channel">
                 <img src="http://beeclouddoc.qiniudn.com/paypal.png" alt="PAYPAL PAYPAL">
+            </li>
+            <li onclick="switch_img(this)">
+                <input type="radio" value="BC_GATEWAY" name="channel">
+                <img src="static/gateway_pay.png" alt="BC GATEWAY">
+            </li>
+            <li onclick="switch_img(this)">
+                <input type="radio" value="BC_EXPRESS" name="channel">
+                <img src="static/bc_express.png" alt="BC EXPRESS">
             </li>
             <!--
             <li onclick="switch_img(this)">
@@ -240,6 +248,10 @@
             <li onclick="switch_img(this)">
                 <input type="radio" value="BD" name="channel">
                 <img src="http://beeclouddoc.qiniudn.com/bd.png" alt="BAIDU">
+            </li>
+            <li onclick="switch_img(this)">
+                <input type="radio" value="BC" name="channel">
+                <img src="static/bc.png" alt="BeeCloud">
             </li>
             <li onclick="switch_img(this)">
                 <input type="radio" value="ALL" name="channel">

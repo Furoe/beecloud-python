@@ -60,16 +60,27 @@ def app_bill():
         else:
             open_id = fetch_open_id(wx_appid, wx_app_secret, code)
             return _deal_with_normal_pay(channel, open_id)
+    elif channel == 'BC_GATEWAY':
+        bank = request.form.get('bank')
+        if not bank:
+            return app.send_static_file('choose_bank.html')
+        else:
+            return _deal_with_normal_pay('BC_GATEWAY', '', bank)
     else:
         return _deal_with_normal_pay(channel, '')
 
 
-def _deal_with_normal_pay(channel, open_id):
+def _deal_with_normal_pay(channel, open_id, bank=None):
     # wx js api 需要先获取支付人的open id
     req_params = BCPayReqParams()
+
+    # 当channel为BC_GATEWAY时，bank必填
+    if channel == 'BC_GATEWAY':
+        req_params.bank = bank
+
     req_params.channel = channel
     req_params.title = u'python {:s} 支付测试'.format(channel)
-    req_params.total_fee = 1
+    req_params.total_fee = 2
     req_params.bill_no = order_num_on_datetime()
     req_params.optional = {'lang': 'python', u'中文key': u'中文value'}
     # 支付完成后的跳转页面
@@ -293,13 +304,13 @@ def app_transfer():
         transfer_params.transfer_data = [item1, item2]
 
         result = bc_pay.batch_transfer(transfer_params)
-    elif channel == 'BC_TRANSFER':  # 比可代付
+    elif channel == 'BC_TRANSFER':  # 比可企业打款
         transfer_params = BCCardTransferParams()
         # 单位为分
         transfer_params.total_fee = 1
         transfer_params.bill_no = order_num_on_datetime()
         # 最长支持16个汉字
-        transfer_params.title = u'python比可代付测试'
+        transfer_params.title = u'python比可企业打款测试'
         # 银行缩写编码
         transfer_params.bank_code = 'BOC'
         # 银行联行行号
@@ -342,7 +353,7 @@ def app_transfer():
             # 微信红包1.00-200元
             transfer_params.total_fee = 100
             transfer_params.channel_user_id = 'o3kKrjlUsMnv__cK5DYZMl0JoAkY'
-        else:
+        else:       # ALI_TRANSFER 支付宝单笔打款
             transfer_params.transfer_no = order_num_on_datetime()
             transfer_params.total_fee = 1
             transfer_params.channel_user_id = 'py@beecloud.cn'
@@ -351,6 +362,9 @@ def app_transfer():
 
         result = bc_pay.transfer(transfer_params)
 
+    if not result.result_code:
+        print("beecloud transfer object id: " + result.id)
+    
     if hasattr(result, 'url') and result.url:
         # 支付宝需要跳转到如下支付宝链接输入支付密码确认
         return redirect(result.url)

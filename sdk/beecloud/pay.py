@@ -171,6 +171,7 @@ class BCPay:
         set_common_attr(resp_dict, bc_result)
 
         if not bc_result.result_code:
+            bc_result.id = resp_dict.get('id')
             # for ali
             bc_result.url = resp_dict.get('url')
 
