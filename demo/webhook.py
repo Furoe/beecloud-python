@@ -65,6 +65,7 @@ def app_accept_webhook():
 	bill_num = json_data['transaction_id']
 	'''
 	以下为伪代码：
+	#从自己系统的数据库中根据订单号取出订单数据，如发现已经支付成功，则忽略该订单
 	bill_info = db_utils.get_bill_by_num(bill_num)
 	if bill_info.pay_result == 'SUCCESS':
 		return ''
