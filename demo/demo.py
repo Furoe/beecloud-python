@@ -311,10 +311,6 @@ def app_transfer():
         transfer_params.bill_no = order_num_on_datetime()
         # 最长支持16个汉字
         transfer_params.title = u'python比可企业打款测试'
-        # 银行缩写编码
-        transfer_params.bank_code = 'BOC'
-        # 银行联行行号
-        transfer_params.bank_associated_code = '1043050000'
         # 银行全名
         transfer_params.bank_fullname = u'中国银行'
         # DE代表借记卡，CR代表信用卡

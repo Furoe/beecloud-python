@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.1.0-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.2.0-blue.svg)
 
 ## 简介
 
@@ -197,7 +197,7 @@ result = bc_pay.audit_pre_refunds(req_params)
 
  * **单笔打款**包含`WX_REDPACK`（微信红包）、`WX_TRANSFER`（微信企业打款）和`ALI_TRANSFER`（支付宝企业打款），通过`BCPay`的实例，以`transfer`方法，结合`BCTransferReqParams`参数发起打款；  
 
- * **比可企业打款**通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起打款；
+ * **比可企业打款**通过`BCPay`的实例，以`bc_transfer`方法，结合`BCCardTransferParams`参数发起打款；该打款渠道支持的银行列表，可以通过`BCQuery`中的`query_bc_transfer_supported_banks`方法进行查询；
   
  * **批量打款**目前只支持`ALI`（支付宝批量打款），通过`BCPay`的实例，以`batch_transfer`方法，结合`BCBatchTransferParams`参数发起打款；
 

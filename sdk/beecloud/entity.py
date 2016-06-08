@@ -52,6 +52,7 @@ class BCChannelType:
     UN = 'UN'
     UN_APP = 'UN_APP'
     UN_WEB = 'UN_WEB'
+    UN_WAP = 'UN_WAP'
 
     JD = 'JD'
     JD_WAP = 'JD_WAP'
@@ -338,12 +339,6 @@ class BCCardTransferParams:
 
         # 交易源
         self.trade_source = 'OUT_PC'
-
-        # 银行编码
-        self.bank_code = None
-
-        # 银行联行行号
-        self.bank_associated_code = None
 
         # 银行全名
         self.bank_fullname = None
