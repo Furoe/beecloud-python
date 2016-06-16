@@ -268,3 +268,29 @@ class BCQuery:
             bc_result.refund_status = resp_dict.get('refund_status')
 
         return bc_result
+
+    def query_bc_transfer_supported_banks(self, transfer_type):
+        """
+        query bc_transfer supported banks, used by BCCardTransferParams field: bank_fullname
+        :param transfer_type: P_DE:对私借记卡, P_CR:对私信用卡, C:对公账户
+        :return:
+        """
+        query_param = _TmpObject()
+        query_param.type = transfer_type
+        url = get_random_host() + 'rest/bc_transfer/banks?para=' + obj_to_quote_str(query_param)
+        tmp_resp = http_get(url, self.bc_app.timeout)
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+        bc_result = BCResult()
+
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.size = resp_dict.get('size')
+            bc_result.bank_list = resp_dict.get('bank_list')
+
+        return bc_result
