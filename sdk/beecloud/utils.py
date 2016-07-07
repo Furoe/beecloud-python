@@ -60,7 +60,7 @@ def _http_req_with_params(url, obj, method='POST', timeout=None):
     except requests.exceptions.ConnectionError:
         return _deal_with_conn_error()
 
-    if http_resp.status_code == 200:
+    if http_resp.status_code == 200 or (400 <= http_resp.status_code < 500):
         http_resp.encoding = 'UTF-8'
         return URL_REQ_SUCC, http_resp.json()
     else:
@@ -109,7 +109,7 @@ def http_get(url, timeout=None):
     except requests.exceptions.ConnectionError:
         return _deal_with_conn_error()
 
-    if http_resp.status_code == 200:
+    if http_resp.status_code == 200 or (400 <= http_resp.status_code < 500):
         http_resp.encoding = 'UTF-8'
         return URL_REQ_SUCC, http_resp.json()
     else:

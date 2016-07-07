@@ -63,7 +63,7 @@ def app_bill():
     elif channel == 'BC_GATEWAY':
         bank = request.form.get('bank')
         if not bank:
-            return app.send_static_file('choose_bank.html')
+            return render_template('choose_bank.html', banks=bc_query.query_bc_gateway_supported_banks())
         else:
             return _deal_with_normal_pay('BC_GATEWAY', '', bank)
     else:
