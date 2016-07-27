@@ -342,7 +342,7 @@ class BCPay:
         """
         return rest_update_object(self.bc_app, self._subscription_url(), sid, **kwargs)
 
-    def cancel_subscription(self, sid, at_period_end):
+    def cancel_subscription(self, sid, at_period_end=None):
         """
         create subscription
         :param sid: subscription id

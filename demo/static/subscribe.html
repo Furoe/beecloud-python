@@ -37,7 +37,6 @@
                 url: '/sms?mobile=' + $('#mobile').val(),
                 dataType: 'text',
                 success: function (data) {
-                    alert(data)
                     $('#sms_id').val(data);
                     alert("code sent successfully")
                 }

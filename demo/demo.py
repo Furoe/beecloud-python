@@ -415,7 +415,7 @@ def sms():
         return result.sms_id
     else:
         print(result.result_msg)
-        print (result.err_detail)
+        print(result.err_detail)
         return ''
 
 
@@ -426,7 +426,20 @@ def subscriptions():
     # param.buyer_id = 'xz'
 
     result = bc_query.query_subscriptions()
-    return ''
+    return render_template('subscriptions.html', subscriptions=result.subscriptions)
+
+
+@app.route('/cancel_subscription')
+def cancel_subscription():
+    sid = request.args.get('sid')
+    if not sid:
+        return ''
+
+    result = bc_pay.cancel_subscription(sid)
+    if result.result_code:
+        return 'cancel failed, reason: ' + result.result_msg + ' | ' + result.err_detail
+    else:
+        return 'cancel succ, subscription id: ' + result.id
 
 
 @app.template_filter('format_utc_time')

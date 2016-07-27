@@ -282,7 +282,6 @@ def rest_add_object(bc_app, url, obj, json_obj_str, obj_type):
 
     bc_result = BCResult()
     set_common_attr(resp_dict, bc_result)
-    print(resp_dict)
     if not bc_result.result_code:
         setattr(bc_result, json_obj_str, parse_dict_to_obj(resp_dict.get(json_obj_str), obj_type))
 
@@ -380,7 +379,6 @@ def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
     resp_dict = tmp_resp[1]
     bc_result = BCResult()
     set_common_attr(resp_dict, bc_result)
-
     if not bc_result.result_code:
         # if only query count
         if hasattr(query_param, 'count_only') and query_param.count_only:

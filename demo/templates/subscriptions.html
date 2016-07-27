@@ -12,50 +12,38 @@
     <table>
         <tr>
             <th>订阅记录的唯一标识</th>
-            <th>支付订单号</th>
-            <th>支付渠道</th>
-            <th>支付子渠道</th>
-            <th>渠道返回的交易号</th>
-            <th>订单创建时间</th>
-            <!-- <th>附加数据</th> -->
-            <th>订单是否成功</th>
-            <th>商品标题</th>
-            <th>订单金额/分</th>
-            <!-- <th>渠道详细信息</th> -->
-            <th>订单是否已经撤销</th>
-            <th>订单是否已经退款</th>
-            <th width="30px">退款</th>
-            <th width="30px">预退款</th>
+            <th>订阅用户id</th>
+            <th>订阅计划id</th>
+            <th>支付账户id</th>
+            <th>订阅用户银行名称</th>
+            <th>订阅用户银行卡号后四位</th>
+            <th>订阅用户身份证姓名</th>
+            <th>订阅用户身份证号</th>
+            <th>订阅用户银行预留手机号</th>
+            <th>订阅状态</th>
+            <th>订阅有效</th>
+            <th width="30px">取消订阅</th>
         </tr>
 
-    {% for bill in bills %}
+    {% for subscription in subscriptions %}
         <tr {% if not loop.index%2 %} class="blue_bg" {% endif %}>
-            <td><a href="/bill/id/{{ bill.id }}" target="_blank">{{ bill.id }}</a></td>
-            <td>{{ bill.bill_no }}</td>
-            <td>{{ bill.channel }}</td>
-            <td>{{ bill.sub_channel }}</td>
-            <td>{{ bill.trade_no }}</td>
-            <td>{{ bill.create_time | format_utc_time }}</td>
-            <!-- <td>{{ bill.optional }}</td>  -->
-            <td>{{ bill.spay_result  }}</td>
-            <td>{{ bill.title }}</td>
-            <td>{{ bill.total_fee }}</td>
-            <!-- <td>{{ bill.message_detail }}</td>  -->
-            <td>{{ bill.revert_result  }}</td>
-            <td>{{ bill.refund_result }}</td>
-            <td>{% if not bill.refund_result %}
-                <a href="/refund?bill_no={{ bill.bill_no }}&channel={{ bill.channel }}&refund_fee={{ bill.total_fee }}" target="_blank">退款</a>
-                {% endif %}
-            </td>
-            <td>{% if not bill.refund_result %}
-                <a href="/refund?bill_no={{ bill.bill_no }}&channel={{ bill.channel }}&refund_fee={{ bill.total_fee }}&need_approval=True" target="_blank">预退款</a>
-                {% endif %}
+            <td>{{ subscription.id }}</td>
+            <td>{{ subscription.buyer_id }}</td>
+            <td>{{ subscription.plan_id }}</td>
+            <td>{{ subscription.card_id }}</td>
+            <td>{{ subscription.bank_name }}</td>
+            <td>{{ subscription.last4 }}</td>
+            <td>{{ subscription.id_name  }}</td>
+            <td>{{ subscription.id_no }}</td>
+            <td>{{ subscription.mobile }}</td>
+            <td>{{ subscription.status }}</td>
+            <td>{{ subscription.valid }}</td>
+            <td>
+                <a href="/cancel_subscription?sid={{ subscription.id }}" target="_blank">取消订阅</a>
             </td>
         </tr>
     {% endfor %}
     </table>
 
-    <div style="margin:30px;font-size: large">相同条件下的订单总数：
-        <span id="total_count" style="color: #ff6c2c"></span></div>
 </body>
 </html>
