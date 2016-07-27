@@ -197,6 +197,25 @@ class BCQueryReqParams:
         self.limit = None
 
 
+# 不可用于订单和退款的查询！！！
+class BCQueryObjCommonParams:
+    def __init__(self):
+        # query objects created before or equal to the given UNIX timestamp in ms
+        self.created_before = None
+
+        # query objects created after or equal to the given UNIX timestamp in ms
+        self.created_after = None
+
+        # If count_only is true, only the total count of all objects that match your filters will be returned
+        self.count_only = None
+
+        # skip some objects for pagination
+        self.skip = None
+
+        # limit the number of objects
+        self.limit = None
+
+
 class BCResult:
     def __init__(self):
         self.result_code = None
@@ -444,6 +463,76 @@ class BCPayPalCreditCard:
 
         # 卡类别
         self.card_type = None
+
+
+class BCPlan:
+    def __init__(self):
+        # 订阅计划的唯一标识
+        self.id = None
+
+        # positive integer in cents representing how much to charge on a recurring basis
+        self.fee = None
+
+        # specify billing frequency:day, week, month or year.
+        self.interval = None
+
+        # name of the plan
+        self.name = None
+
+        # 3-letter ISO code for currency
+        self.currency = None
+
+        # the number of intervals between each subscription billing
+        self.interval_count = None
+
+        # specify a trial period in (an integer number of) days
+        self.trial_days = None
+
+        # a set of key/value pairs that you can attach to a plan object
+        self.optional = None
+
+
+class BCSubscription:
+    def __init__(self):
+        # 订阅记录的唯一标识
+        self.id = None
+
+        # 订阅的buyer ID，可以是用户email，也可以是商户系统中的用户ID
+        self.buyer_id = None
+
+        # The identifier of the plan to subscribe the customer to
+        self.plan_id = None
+
+        # The card used to pay this subscription
+        self.card_id = None
+
+        # 订阅用户银行名称
+        self.bank_name = None
+
+        # 订阅用户银行卡号
+        self.card_no = None
+
+        # 订阅用户身份证姓名
+        self.id_name = None
+
+        # 订阅用户身份证号
+        self.id_no = None
+
+        # 订阅用户银行预留手机号
+        self.mobile = None
+
+        # The amount you'd like to apply to the subscription you're creating
+        self.amount = None
+
+        # The coupon ID to apply to this subscription
+        self.coupon_id = None
+
+        # timestamp representing the end of the trial period
+        self.trial_end = None
+
+        # A set of key/value pairs that you can attach to a subscription object
+        self.optional = None
+
 
 class _TmpObject:
     pass

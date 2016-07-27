@@ -78,6 +78,10 @@
             q_form.attr("action", '/query_pre_refunds');
             q_form.submit();
         }
+
+        function query_subscriptions() {
+            window.open("/subscriptions")
+        }
     </script>
 </head>
 <body>
@@ -179,6 +183,18 @@
         <input type="submit" class="button" value="确认付款">
     </div>
 </form>
+
+<hr style="width:100%;margin-top:30px;"/>
+
+<form action="/static/subscribe.html" style="width:85%;margin:0 auto;clear:both" method="get" target="_blank">
+    <div style="clear:both;width:200px;margin:0 auto;">
+        <input type="submit" class="button" value="订阅支付">
+    </div>
+</form>
+
+<div style="clear:both;width:200px;margin:0 auto;">
+    <input onclick="query_subscriptions()" type="button" class="button" value="查看所有的订阅">
+</div>
 
 <hr style="width:100%;margin-top:30px;"/>
 

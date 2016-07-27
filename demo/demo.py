@@ -13,7 +13,7 @@ from beecloud.query import BCQuery
 from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
-    BCTransferRedPack, BCCardTransferParams
+    BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryObjCommonParams
 import json
 
 app = Flask(__name__)
@@ -21,9 +21,11 @@ app = Flask(__name__)
 # init
 bc_app = BCApp()
 # bc_app.is_test_mode = True
+
 bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
 bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
 bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+
 # bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
 # 以下是jsapi的测试参数
@@ -366,7 +368,66 @@ def app_transfer():
         return redirect(result.url)
 
     return str(result.result_code) + ' # ' + result.result_msg + ' # ' + result.err_detail
-        
+
+
+@app.route('/subscribe', methods=['POST'])
+def subscribe():
+    param = BCSubscription()
+    for k, v in request.form.to_dict().items():
+        if not k.startswith('sms'):
+            setattr(param, k, v)
+
+    result = bc_pay.subscribe(param, request.form['sms_id'], request.form['sms_code'])
+    if result.result_code:
+        return u'订阅失败：' + result.result_msg + " | " + result.err_detail
+    else:
+        return u'订阅请求成功，请注意webhook接收最终审核结果：' + result.subscription.id
+
+
+@app.route('/subscription/banks')
+def subscription_supported_banks():
+    result = bc_query.query_subscription_payment_supported_banks()
+    if not result.result_code:
+        return json.dumps(result.common_banks)
+    else:
+        return '[]'
+
+
+@app.route('/subscription/plans')
+def subscription_plans():
+    result = bc_query.query_plans()
+    if not result.result_code:
+        data = []
+        for plan in result.plans:
+            data.append({'id': plan.id, 'name': plan.name})
+        return json.dumps(data)
+    else:
+        return '{}'
+
+
+@app.route('/sms')
+def sms():
+    mobile = request.args.get('mobile')
+    print(mobile)
+    result = bc_pay.send_sms_passcode(mobile)
+    if not result.result_code:
+        print('sms id:' + result.sms_id)
+        return result.sms_id
+    else:
+        print(result.result_msg)
+        print (result.err_detail)
+        return ''
+
+
+@app.route('/subscriptions')
+def subscriptions():
+    # 自定义你的查询条件
+    # param = BCQueryObjCommonParams()
+    # param.buyer_id = 'xz'
+
+    result = bc_query.query_subscriptions()
+    return ''
+
 
 @app.template_filter('format_utc_time')
 def format_utc_time(s):

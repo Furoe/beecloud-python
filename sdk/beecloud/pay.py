@@ -8,9 +8,10 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from beecloud.entity import BCChannelType, BCResult, BCReqType
+from beecloud.entity import BCChannelType, BCResult, BCReqType, BCPlan, BCSubscription, _TmpObject
 from beecloud.utils import get_random_host, http_post, http_put, set_common_attr, \
-    report_not_supported_err, obj_to_dict, attach_app_sign
+    report_not_supported_err, obj_to_dict, attach_app_sign, rest_add_object, \
+    rest_update_object, rest_delete_object
 
 
 class BCPay:
@@ -45,11 +46,17 @@ class BCPay:
     def _batch_transfer_url(self):
         return get_random_host() + 'rest/transfers'
 
+    def _plan_url(self):
+        return get_random_host() + 'plan'
+
+    def _subscription_url(self):
+        return get_random_host() + 'subscription'
+
     def pay(self, pay_params):
         """
         payment API, different channels have different requirements for request params
         and the return params varies.
-        refer to restful API https://beecloud.cn/doc/ #2
+        refer to restful API https://beecloud.cn/doc/?index=rest-api #2
         :param pay_params: beecloud.entity.BCPayReqParams
         :return: beecloud.entity.BCResult
         """
@@ -90,7 +97,7 @@ class BCPay:
         refund API, refund fee should not be greater than bill total fee;
         need_approval is for pre refund, you have to call [audit_pre_refunds] later on to execute real refund
         if the bill is paid with ali, you have to input your password on the returned url page
-        refer to restful API https://beecloud.cn/doc/ #3
+        refer to restful API https://beecloud.cn/doc/?index=rest-api #3
         :param refund_params: beecloud.entity.BCRefundReqParams
         :return: beecloud.entity.BCResult
         """
@@ -121,7 +128,7 @@ class BCPay:
         batch manage pre refunds;
         pre refund id list is required;
         each refund result is kept in result_map
-        refer to restful API https://beecloud.cn/doc/ #4
+        refer to restful API https://beecloud.cn/doc/?index=rest-api #4
         :param pre_refund_params: beecloud.entity.BCPreRefundReqParams
         :return: beecloud.entity.BCResult
         """
@@ -180,7 +187,7 @@ class BCPay:
     def bc_transfer(self, transfer_params):
         """
         for BeeCloud transfer via bank card
-        refer to https://beecloud.cn/doc/?index=2
+        refer to https://beecloud.cn/doc/?index=rest-api-transfer
         :param transfer_params: beecloud.entity.BCCardTransferParams
         :return: beecloud.entity.BCResult
         """
@@ -191,7 +198,7 @@ class BCPay:
     def transfer(self, transfer_params):
         """
         for WX_REDPACK, WX_TRANSFER, ALI_TRANSFER
-        refer to https://beecloud.cn/doc/?index=2
+        refer to https://beecloud.cn/doc/?index=rest-api-transfer
         redpack_info should be type of beecloud.entity.BCTransferRedPack
         :param transfer_params: beecloud.entity.BCTransferReqParams
         :return: beecloud.entity.BCResult
@@ -203,7 +210,7 @@ class BCPay:
     def batch_transfer(self, transfer_params):
         """
         batch transfer, currently only ALI is supported
-        refer to https://beecloud.cn/doc/?index=2
+        refer to https://beecloud.cn/doc/?index=rest-api-transfer
         transfer_data should be type of beecloud.entity.BCBatchTransferItem
         :param transfer_params: beecloud.entity.BCBatchTransferParams
         :return: beecloud.entity.BCResult
@@ -251,3 +258,97 @@ class BCPay:
             bc_result.credit_card_id = resp_dict.get('credit_card_id')
 
         return bc_result
+
+    def send_sms_passcode(self, phone):
+        """
+        send sms verify code
+        :param phone: phone number passcode sent to
+        :return: beecloud.entity.BCResult, which contains sms_id
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('send_sms_passcode')
+
+        tmp_obj = _TmpObject()
+        tmp_obj.phone = phone
+        attach_app_sign(tmp_obj, BCReqType.PAY, self.bc_app)
+        tmp_resp = http_post(get_random_host() + "sms", tmp_obj, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.sms_id = resp_dict.get('sms_id')
+
+        return bc_result
+
+    def create_plan(self, plan):
+        """
+        create subscription plan
+        :param plan: beecloud.entity.BCPlan
+        :return: beecloud.entity.BCResult
+        """
+        return rest_add_object(self.bc_app, self._plan_url(), plan, 'plan', BCPlan)
+
+    def update_plan(self, plan_id, name=None, optional=None):
+        """
+        update subscription plan
+        :param plan_id: plan object id
+        :param name: plan name
+        :param optional: dict -- key/value pairs
+        :return: beecloud.entity.BCResult
+        """
+        return rest_update_object(self.bc_app, self._plan_url(), plan_id, name=name, optional=optional)
+
+    def delete_plan(self, plan_id):
+        """
+        delete subscription plan
+        :param plan_id: plan object id
+        :return: beecloud.entity.BCResult
+        """
+        return rest_delete_object(self.bc_app, self._plan_url(), plan_id)
+
+    def subscribe(self, subscription, sms_id, sms_code, coupon_code=None):
+        """
+        create subscription
+        :param subscription: beecloud.entity.BCSubscription
+                coupon_code should be used instead of coupon_id if there is a discount
+                card_id or {bank_name, card_no, id_name, id_no, mobile} should be supplied
+                card_id can be gotten from webhook provided that subscription is successful
+                bank_name can be chosen from BCQuery.query_subscription_payment_supported_banks()
+        :param sms_id: return by send_sms_passcode method
+        :param sms_code: get from user phone
+        :param coupon_code: the coupon code to apply to this subscription
+        :return: beecloud.entity.BCResult
+        """
+        setattr(subscription, 'sms_id', sms_id)
+        setattr(subscription, 'sms_code', sms_code)
+        if coupon_code:
+            setattr(subscription, 'coupon_code', coupon_code)
+        return rest_add_object(self.bc_app, self._subscription_url(), subscription, 'subscription', BCSubscription)
+
+    def update_subscription(self, sid, **kwargs):
+        """
+        create subscription
+        :param sid: subscription id
+        :param kwargs: items can updated, like amount=2
+        :return: beecloud.entity.BCResult
+        """
+        return rest_update_object(self.bc_app, self._subscription_url(), sid, **kwargs)
+
+    def cancel_subscription(self, sid, at_period_end):
+        """
+        create subscription
+        :param sid: subscription id
+        :param at_period_end: boolean
+                a flag that if set to true will delay the cancellation of the subscription
+                until the end of the current period.
+        :return: beecloud.entity.BCResult
+        """
+        return rest_delete_object(self.bc_app, self._subscription_url(), sid, at_period_end=at_period_end)
