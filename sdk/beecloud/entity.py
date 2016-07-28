@@ -470,25 +470,25 @@ class BCPlan:
         # 订阅计划的唯一标识
         self.id = None
 
-        # positive integer in cents representing how much to charge on a recurring basis
+        # 扣款单价
         self.fee = None
 
-        # specify billing frequency:day, week, month or year.
+        # 扣款周期:day, week, month or year.
         self.interval = None
 
-        # name of the plan
+        # 计划名
         self.name = None
 
-        # 3-letter ISO code for currency
+        # ISO货币名，如'CNY'
         self.currency = None
 
-        # the number of intervals between each subscription billing
+        # 如果是3，那么每3个interval扣款，订阅系统默认1
         self.interval_count = None
 
-        # specify a trial period in (an integer number of) days
+        # 试用天数
         self.trial_days = None
 
-        # a set of key/value pairs that you can attach to a plan object
+        # dict类型的额外信息
         self.optional = None
 
 
@@ -500,10 +500,11 @@ class BCSubscription:
         # 订阅的buyer ID，可以是用户email，也可以是商户系统中的用户ID
         self.buyer_id = None
 
-        # The identifier of the plan to subscribe the customer to
+        # 订阅计划id
         self.plan_id = None
 
-        # The card used to pay this subscription
+        # 由{订阅用户银行名称、订阅用户银行卡号、订阅用户身份证姓名、订阅用户身份证号、订阅用户银行预留手机号}的组合确定
+        # 实际发起订阅请求时可以直接使用该id，或者以上的组合
         self.card_id = None
 
         # 订阅用户银行名称
@@ -521,17 +522,23 @@ class BCSubscription:
         # 订阅用户银行预留手机号
         self.mobile = None
 
-        # The amount you'd like to apply to the subscription you're creating
+        # 每次扣款总额为 订阅计划的金额 * amount，订阅系统默认为1
         self.amount = None
 
-        # The coupon ID to apply to this subscription
+        # 优惠标识id
         self.coupon_id = None
 
-        # timestamp representing the end of the trial period
+        # 试用截止时间戳
         self.trial_end = None
 
-        # A set of key/value pairs that you can attach to a subscription object
+        # dict类型的额外信息
         self.optional = None
+
+        # 订阅状态，查询时返回
+        self.status = None
+
+        # 订阅是否已经生效，查询时返回
+        self.valid = None
 
 
 class _TmpObject:
