@@ -154,10 +154,10 @@ def app_subscription_webhook():
         # 这边有一个比较重要的信息card_id可以在获取第一次推送的时候留存，
         # 它是由{订阅用户银行名称、订阅用户银行卡号、订阅用户身份证姓名、订阅用户身份证号、订阅用户银行预留手机号}的组合确定，
         # 其他的信息建议在创建的时候就保存
-        print('订阅成功')
+        print(u'订阅成功')
         message_detail = json_data.get('message_detail')
         if message_detail:
-            print('订阅账户标识id：' + message_detail.get('card_id'))
+            print(u'订阅账户标识id：' + message_detail.get('card_id'))
     elif transaction_type == 'PAY' and sub_channel_type == 'BC_SUBSCRIPTION':
         # 表示扣款的结果推送
         '''
@@ -165,18 +165,18 @@ def app_subscription_webhook():
         如果已经包含相关的记录，那么直接忽略；
         详细的信息可以通过如下方式获取
         '''
-        print('订阅扣款费用：' + str(json_data.get('transaction_fee')))
+        print(u'订阅扣款费用：' + str(json_data.get('transaction_fee')))
         message_detail = json_data.get('message_detail')
         if message_detail:
-            print('订阅扣款记录标识id：' + message_detail.get('subscription_id'))
-            print('订阅计划标识id：' + message_detail.get('plan_id'))
-            print('订阅用户id：' + message_detail.get('buyer_id'))
-            print('订阅账户标识id：' + message_detail.get('card_id'))
-            print('订阅用户身份证号：' + message_detail.get('id_no'))
-            print('订阅用户身份证姓名：' + message_detail.get('id_name'))
-            print('订阅用户银行卡号：' + message_detail.get('card_no'))
-            print('订阅用户银行名称：' + message_detail.get('bank_name'))
-            print('订阅用户银行预留手机号：' + message_detail.get('mobile'))
+            print(u'订阅扣款记录标识id：' + message_detail.get('subscription_id'))
+            print(u'订阅计划标识id：' + message_detail.get('plan_id'))
+            print(u'订阅用户id：' + message_detail.get('buyer_id'))
+            print(u'订阅账户标识id：' + message_detail.get('card_id'))
+            print(u'订阅用户身份证号：' + message_detail.get('id_no'))
+            print(u'订阅用户身份证姓名：' + message_detail.get('id_name'))
+            print(u'订阅用户银行卡号：' + message_detail.get('card_no'))
+            print(u'订阅用户银行名称：' + message_detail.get('bank_name'))
+            print(u'订阅用户银行预留手机号：' + message_detail.get('mobile'))
 
     # 用户返回 success 字符串给BeeCloud表示 - 正确接收并处理了本次Webhook
     # 其他所有返回都代表需要继续重传本次的Webhook请求
