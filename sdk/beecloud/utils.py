@@ -22,15 +22,9 @@ import json
 
 if sys.version_info[0] == 3:   # if 3
     import urllib.parse
-    from json.decoder import JSONDecodeError
-    # for py 3 requests response.json() may cause JSONDecodeError
-    JsonError = JSONDecodeError
     long = int
 else:
     import urllib
-    # for py 2 requests response.json() may cause ValueError
-    JsonError = ValueError
-
 
 URL_REQ_SUCC = 1
 URL_REQ_FAIL = 0
@@ -72,7 +66,7 @@ def _http_req_with_params(url, obj, method='POST', timeout=None):
         http_resp.encoding = 'UTF-8'
         try:
             result_json = http_resp.json()
-        except JsonError:
+        except ValueError:
             return _deal_with_invalid_resp(http_resp)
         else:
             return URL_REQ_SUCC, result_json
@@ -149,7 +143,7 @@ def http_get(url, timeout=None, params=None):
         http_resp.encoding = 'UTF-8'
         try:
             result_json = http_resp.json()
-        except JsonError:
+        except ValueError:
             return _deal_with_invalid_resp(http_resp)
         else:
             return URL_REQ_SUCC, result_json
@@ -173,7 +167,7 @@ def http_del(url, timeout=None):
         http_resp.encoding = 'UTF-8'
         try:
             result_json = http_resp.json()
-        except JsonError:
+        except ValueError:
             return _deal_with_invalid_resp(http_resp)
         else:
             return URL_REQ_SUCC, result_json
