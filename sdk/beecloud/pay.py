@@ -9,7 +9,7 @@
 """
 
 from beecloud.entity import BCChannelType, BCResult, BCReqType, BCPlan, BCSubscription, _TmpObject
-from beecloud.utils import get_random_host, http_post, http_put, set_common_attr, \
+from beecloud.utils import get_rest_root_url, http_post, http_put, set_common_attr, \
     report_not_supported_err, obj_to_dict, attach_app_sign, rest_add_object, \
     rest_update_object, rest_delete_object
 
@@ -27,30 +27,30 @@ class BCPay:
 
     def _bill_pay_url(self):
         if self.bc_app.is_test_mode:
-            return get_random_host() + 'rest/sandbox/bill'
+            return get_rest_root_url() + 'rest/sandbox/bill'
         else:
-            return get_random_host() + 'rest/bill'
+            return get_rest_root_url() + 'rest/bill'
 
     def _international_pay_url(self):
-        return get_random_host() + 'rest/international/bill'
+        return get_rest_root_url() + 'rest/international/bill'
 
     def _bill_refund_url(self):
-        return get_random_host() + 'rest/refund'
+        return get_rest_root_url() + 'rest/refund'
 
     def _bill_transfer_url(self):
-        return get_random_host() + 'rest/transfer'
+        return get_rest_root_url() + 'rest/transfer'
 
     def _bc_transfer_url(self):
-        return get_random_host() + 'rest/bc_transfer'
+        return get_rest_root_url() + 'rest/bc_transfer'
 
     def _batch_transfer_url(self):
-        return get_random_host() + 'rest/transfers'
+        return get_rest_root_url() + 'rest/transfers'
 
     def _plan_url(self):
-        return get_random_host() + 'plan'
+        return get_rest_root_url() + 'plan'
 
     def _subscription_url(self):
-        return get_random_host() + 'subscription'
+        return get_rest_root_url() + 'subscription'
 
     def pay(self, pay_params):
         """
@@ -265,13 +265,10 @@ class BCPay:
         :param phone: phone number passcode sent to
         :return: beecloud.entity.BCResult, which contains sms_id
         """
-        if self.bc_app.is_test_mode:
-            return report_not_supported_err('send_sms_passcode')
-
         tmp_obj = _TmpObject()
         tmp_obj.phone = phone
         attach_app_sign(tmp_obj, BCReqType.PAY, self.bc_app)
-        tmp_resp = http_post(get_random_host() + "sms", tmp_obj, self.bc_app.timeout)
+        tmp_resp = http_post(get_rest_root_url() + "sms", tmp_obj, self.bc_app.timeout)
 
         # if err encountered, [0] equals 0
         if not tmp_resp[0]:

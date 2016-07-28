@@ -9,7 +9,7 @@
 """
 
 from beecloud.entity import BCResult, BCBill, BCRefund, BCReqType, BCPlan, BCSubscription, _TmpObject
-from beecloud.utils import get_random_host, http_get, obj_to_quote_str, set_common_attr, \
+from beecloud.utils import get_rest_root_url, http_get, obj_to_quote_str, set_common_attr, \
     report_not_supported_err, attach_app_sign, obj_to_dict, parse_dict_to_obj, rest_query_objects,\
     rest_query_object_by_id
 
@@ -32,27 +32,27 @@ class BCQuery:
     
     def _query_bills_url(self):
         if self.bc_app.is_test_mode:
-            return get_random_host() + 'rest/sandbox/bills'
+            return get_rest_root_url() + 'rest/sandbox/bills'
         else:
-            return get_random_host() + 'rest/bills'
+            return get_rest_root_url() + 'rest/bills'
 
     def _query_refunds_url(self):
-        return get_random_host() + 'rest/refunds'
+        return get_rest_root_url() + 'rest/refunds'
 
     def _query_bill_url(self):
         if self.bc_app.is_test_mode:
-            return get_random_host() + 'rest/sandbox/bill'
+            return get_rest_root_url() + 'rest/sandbox/bill'
         else:
-            return get_random_host() + 'rest/bill'
+            return get_rest_root_url() + 'rest/bill'
 
     def _query_refund_url(self):
-        return get_random_host() + 'rest/refund'
+        return get_rest_root_url() + 'rest/refund'
 
     def _query_plan_url(self):
-        return get_random_host() + 'plan'
+        return get_rest_root_url() + 'plan'
 
     def _query_subscription_url(self):
-        return get_random_host() + 'subscription'
+        return get_rest_root_url() + 'subscription'
 
     def _query_orders(self, query_params, query_type):
         if query_type == _OrderType.BILL:
@@ -276,7 +276,7 @@ class BCQuery:
         """
         query_param = _TmpObject()
         query_param.type = transfer_type
-        url = get_random_host() + 'rest/bc_transfer/banks?para=' + obj_to_quote_str(query_param)
+        url = get_rest_root_url() + 'rest/bc_transfer/banks?para=' + obj_to_quote_str(query_param)
         tmp_resp = http_get(url, self.bc_app.timeout)
         # if err encountered, [0] equals 0
         if not tmp_resp[0]:
@@ -330,7 +330,7 @@ class BCQuery:
         """
         query_param = _TmpObject()
         attach_app_sign(query_param, BCReqType.QUERY, self.bc_app)
-        url = get_random_host() + 'subscription_banks'
+        url = get_rest_root_url() + 'subscription_banks'
         tmp_resp = http_get(url, self.bc_app.timeout, params=obj_to_dict(query_param))
         # if err encountered, [0] equals 0
         if not tmp_resp[0]:

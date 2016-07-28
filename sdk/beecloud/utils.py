@@ -9,9 +9,8 @@
 """
 
 from beecloud.entity import BCResult, BCReqType, _TmpObject
-from beecloud import BEECLOUD_HOSTS, BEECLOUD_RESTFUL_VERSION, NETWORK_ERROR_CODE, NETWORK_ERROR_NAME, \
+from beecloud import BEECLOUD_HOST, BEECLOUD_RESTFUL_VERSION, NETWORK_ERROR_CODE, NETWORK_ERROR_NAME, \
     NOT_SUPPORTED_CODE, NOT_SUPPORTED_NAME
-import random
 import datetime
 import requests
 import requests.exceptions
@@ -30,8 +29,8 @@ URL_REQ_SUCC = 1
 URL_REQ_FAIL = 0
 
 
-def get_random_host():
-    return BEECLOUD_HOSTS[random.randint(0, len(BEECLOUD_HOSTS)-1)] + BEECLOUD_RESTFUL_VERSION
+def get_rest_root_url():
+    return BEECLOUD_HOST + BEECLOUD_RESTFUL_VERSION
 
 
 def obj_to_dict(obj):

@@ -534,6 +534,9 @@ class BCSubscription:
         # dict类型的额外信息
         self.optional = None
 
+        # 订阅用户银行卡号后四位，查询时返回
+        self.last4 = None
+
         # 订阅状态，查询时返回
         self.status = None
 
