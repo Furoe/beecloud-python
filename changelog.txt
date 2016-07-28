@@ -1,4 +1,4 @@
-﻿BeeCloud Python Changelog
+BeeCloud Python Changelog
 =============================
 v3.3.0 发布日期：2016年7月7日
 根据rest API升级错误处理
