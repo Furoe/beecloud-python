@@ -254,12 +254,12 @@ def attach_app_sign(req_param, req_type, bc_app):
 
 # ======== BeeCloud restful object CURD start ========
 
-def rest_add_object(bc_app, url, obj, json_obj_str, obj_type):
+def rest_add_object(bc_app, url, obj, json_obj_name, obj_type):
     """
     :param bc_app: used to attach app sign
     :param url: used to post request
     :param obj: like beecloud.entity.BCPlan
-    :param json_obj_str: object json str returned when successful
+    :param json_obj_name: object json name returned when successful, like 'plan'
     :param obj_type: like beecloud.entity.BCPlan
     :return: beecloud.entity.BCResult
     """
@@ -276,7 +276,7 @@ def rest_add_object(bc_app, url, obj, json_obj_str, obj_type):
     bc_result = BCResult()
     set_common_attr(resp_dict, bc_result)
     if not bc_result.result_code:
-        setattr(bc_result, json_obj_str, parse_dict_to_obj(resp_dict.get(json_obj_str), obj_type))
+        setattr(bc_result, json_obj_name, parse_dict_to_obj(resp_dict.get(json_obj_name), obj_type))
 
     return bc_result
 
@@ -296,7 +296,7 @@ def rest_update_object(bc_app, url, obj_id, **kwargs):
                 setattr(tmp_obj, k, v)
 
     attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
-    tmp_resp = http_post(url + '/' + obj_id, tmp_obj, bc_app.timeout)
+    tmp_resp = http_put(url + '/' + obj_id, tmp_obj, bc_app.timeout)
 
     # if err encountered, [0] equals 0
     if not tmp_resp[0]:
@@ -353,7 +353,7 @@ def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
     query object list by conditions
     :param bc_app: used to attach app sign
     :param url: do NOT contain params at the end
-    :param query_param: query condition object beecloud.entity.BCQueryObjCommonParams,
+    :param query_param: query condition object beecloud.entity.BCQueryLimit,
                         more specific conditions can be attached to it
     :param json_obj_name: like 'plans' for plan list query
     :param object_type: object type like beecloud.entity.BCPlan

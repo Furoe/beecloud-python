@@ -13,7 +13,7 @@ from beecloud.query import BCQuery
 from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
-    BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryObjCommonParams
+    BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryLimit
 import json
 
 app = Flask(__name__)
@@ -21,11 +21,9 @@ app = Flask(__name__)
 # init
 bc_app = BCApp()
 # bc_app.is_test_mode = True
-
 bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
 bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
 bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
-
 # bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
 # 以下是jsapi的测试参数
@@ -395,11 +393,12 @@ def subscription_supported_banks():
 
 @app.route('/subscription/plans')
 def subscription_plans():
+    # 自定义你的查询条件
+    # param = BCQueryLimit()
+    # param.limit = 8
     result = bc_query.query_plans()
     if not result.result_code:
-        data = []
-        for plan in result.plans:
-            data.append({'id': plan.id, 'name': plan.name})
+        data = [{'id': plan.id, 'name': plan.name} for plan in result.plans if plan.valid]
         return json.dumps(data)
     else:
         return '{}'
@@ -422,7 +421,7 @@ def sms():
 @app.route('/subscriptions')
 def subscriptions():
     # 自定义你的查询条件
-    # param = BCQueryObjCommonParams()
+    # param = BCQueryLimit()
     # param.buyer_id = 'xz'
 
     result = bc_query.query_subscriptions()

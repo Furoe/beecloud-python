@@ -161,17 +161,18 @@ def app_subscription_webhook():
     elif transaction_type == 'PAY' and sub_channel_type == 'BC_SUBSCRIPTION':
         # 表示扣款的结果推送
         '''
-        查看自己的系统中有没有transaction_id对应的订阅扣费记录，如果没有可以插入新的记录留存；
+        查看自己的系统中有没有transaction_id对应的订阅扣款订单，如果没有可以插入新的记录留存；
         如果已经包含相关的记录，那么直接忽略；
         详细的信息可以通过如下方式获取
         '''
+        print(u'扣款订单号：' + str(json_data.get('transaction_id')))
         print(u'订阅扣款费用：' + str(json_data.get('transaction_fee')))
         message_detail = json_data.get('message_detail')
         if message_detail:
-            print(u'订阅扣款记录标识id：' + message_detail.get('subscription_id'))
-            print(u'订阅计划标识id：' + message_detail.get('plan_id'))
-            print(u'订阅用户id：' + message_detail.get('buyer_id'))
-            print(u'订阅账户标识id：' + message_detail.get('card_id'))
+            print(u'订阅id：' + message_detail.get('subscription_id'))
+            print(u'订阅计划id：' + message_detail.get('plan_id'))
+            print(u'订阅用户在商户系统的id：' + message_detail.get('buyer_id'))
+            print(u'订阅扣款账户id：' + message_detail.get('card_id'))
             print(u'订阅用户身份证号：' + message_detail.get('id_no'))
             print(u'订阅用户身份证姓名：' + message_detail.get('id_name'))
             print(u'订阅用户银行卡号：' + message_detail.get('card_no'))

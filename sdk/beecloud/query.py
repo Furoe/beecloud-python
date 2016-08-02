@@ -309,7 +309,7 @@ class BCQuery:
         """
         query plans
         result contains a list(plan), its items are beecloud.entity.BCPlan
-        :param query_param: query condition object beecloud.entity.BCQueryObjCommonParams
+        :param query_param: query condition object beecloud.entity.BCQueryLimit
                             attach more condition like obj.interval = 'day'
         :return: beecloud.entity.BCResult
         """
@@ -352,7 +352,7 @@ class BCQuery:
         """
         query plans
         result contains a list(plan), its items are beecloud.entity.BCPlan
-        :param query_param: query condition object beecloud.entity.BCQueryObjCommonParams
+        :param query_param: query condition object beecloud.entity.BCQueryLimit
                             attach more condition like obj.interval = 'day'
         :return: beecloud.entity.BCResult
         """

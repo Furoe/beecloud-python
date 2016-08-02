@@ -16,7 +16,7 @@ SDK支持以下支付渠道:
  * 京东
  * 易宝、快钱等
 
-并且包含退款、打款和相应的查询功能，适用于python2.7、python3.4、python3.5。
+并且包含退款、打款、订阅支付和相应的查询功能，适用于python2.7、python3.4、python3.5。
 
 
 ## 安装 Python SDK
@@ -377,7 +377,7 @@ result = bc_query.query_refund_by_id(refund_id)
 
 
 ### 12.退款状态更新
-可以参考`demo.py`中`app_query_refund_status`；<br/>
+可以参考`demo.py`中`app_query_refund_status`；  
 退款状态更新接口提供查询退款状态以更新退款状态的功能，用于对退款后不发送回调的渠道（WX、YEE、KUAIQIAN、BD）退款后的状态更新
 
 #### 原型：
@@ -389,6 +389,96 @@ result = bc_query.query_refund_status(channel, refund_no)
 # 如果查询成功result.refund_status为查询到的退款状态
 ```
 
+  
+### 13.订阅支付
+先查看[订阅系统说明文档](https://github.com/beecloud/beecloud-rest-api/blob/master/subscription/%E8%AE%A2%E9%98%85%E7%B3%BB%E7%BB%9F%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)了解基础概念  
+
+#### 查询计划列表
+可以参考`demo.py`中`subscription_plans`  
+  
+**原型**
+通过`BCQuery`的实例，以`query_plans`方法，结合`BCQueryLimit`参数查询，结果包含`BCPlan`的列表；如果设置了`BCQueryLimit count_only`为`True`，那么结果只包含满足条件的个数`total_count`  
+  
+**调用**
+```python
+result = bc_query.query_plans()
+# 如果查询成功，result.plans为查询到的计划列表
+```
+  
+#### 发起订阅
+可以参考`demo.py`中`subscribe`  
+  
+**原型**
+通过`BCPay`的实例，以`subscribe`方法，结合`BCSubscription`参数、`sms_id`和`sms_code`发起，结果包含`BCSubscription`对象，如果该对象`valid`为`True`表明本次订阅已经即时生效，否则你还需要等待webhook推送最终审核结果；  
+`sms_id`和`sms_code`的获取查看获取验证码方法的说明
+  
+**调用**
+```python
+param = BCSubscription()
+param.buyer_id = 'your_system_buyer_id'
+param.plan_id = 'plan_id'
+param.bank_name = 'choose_from_subscription_payment_supported_banks'
+param.card_no = 'bank_card_number'
+param.id_name = 'name_on_id_card'
+param.id_no = 'id_card_number'
+# 和银行卡绑定的手机号
+param.mobile = 'mobile_number'
+result = bc_pay.subscribe(param, 'sms_id_get_by_send_sms_passcode', 'sms_code_from_user_phone')
+# 如果请求成功，result.subscription为创建的订阅对象
+```
+  
+#### 订阅支付支持的银行列表
+可以参考`demo.py`中`subscription_supported_banks`  
+  
+**原型**
+通过`BCQuery`的实例，结合`query_subscription_payment_supported_banks`方法发起请求
+  
+**调用**
+```python
+result = bc_query.query_subscription_payment_supported_banks()
+# 如果查询成功，result.common_banks包含支持的常用银行列表，result.banks包含全部支持的银行列表
+```
+  
+#### 发送验证码
+可以参考`demo.py`中`sms`  
+  
+**原型**
+通过`BCPay`的实例，结合`send_sms_passcode`方法发起请求，参数接受验证码的手机号，返回结果包含`sms_id`，同时发送`sms_code`到用户手机  
+  
+**调用**
+```python
+result = bc_pay.send_sms_passcode(mobile)
+# 如果请求成功，result.sms_id为本次验证码id
+```
+  
+#### 取消订阅
+可以参考`demo.py`中`cancel_subscription`  
+  
+**原型**
+通过`BCPay`的实例，结合`cancel_subscription`方法发起请求，参数为被取消的订阅id  
+  
+**调用**
+```python
+result = bc_pay.cancel_subscription(sid)
+# 如果操作成功，result.id为本次取消的订阅id
+```
+  
+#### 查询订阅列表
+可以参考`demo.py`中`subscriptions`  
+  
+**原型**
+通过`BCQuery`的实例，以`query_subscriptions`方法，结合`BCQueryLimit`参数查询，结果包含`BCSubscription`的列表；如果设置了`BCQueryLimit count_only`为`True`，那么结果只包含满足条件的个数`total_count`  
+  
+**调用**
+```python
+# 自定义你的查询条件
+# param = BCQueryLimit()
+# param.limit = 8
+# param.buyer_id = 'xz'
+result = bc_query.query_subscriptions()
+# 如果查询成功，result.subscriptions为查询到的计划列表
+```
+  
 
 ## Demo
 项目中的`demo`工程<br>

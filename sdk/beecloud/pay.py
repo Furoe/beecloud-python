@@ -339,13 +339,10 @@ class BCPay:
         """
         return rest_update_object(self.bc_app, self._subscription_url(), sid, **kwargs)
 
-    def cancel_subscription(self, sid, at_period_end=None):
+    def cancel_subscription(self, sid):
         """
         create subscription
         :param sid: subscription id
-        :param at_period_end: boolean
-                a flag that if set to true will delay the cancellation of the subscription
-                until the end of the current period.
         :return: beecloud.entity.BCResult
         """
-        return rest_delete_object(self.bc_app, self._subscription_url(), sid, at_period_end=at_period_end)
+        return rest_delete_object(self.bc_app, self._subscription_url(), sid)

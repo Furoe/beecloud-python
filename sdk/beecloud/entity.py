@@ -198,7 +198,7 @@ class BCQueryReqParams:
 
 
 # 不可用于订单和退款的查询！！！
-class BCQueryObjCommonParams:
+class BCQueryLimit:
     def __init__(self):
         # query objects created before or equal to the given UNIX timestamp in ms
         self.created_before = None
@@ -490,6 +490,9 @@ class BCPlan:
 
         # dict类型的额外信息
         self.optional = None
+
+        # 计划是否生效，查询时返回
+        self.valid = None
 
 
 class BCSubscription:
