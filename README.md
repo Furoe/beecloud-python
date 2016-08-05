@@ -408,31 +408,6 @@ result = bc_query.query_plans()
 # 如果查询成功，result.plans为查询到的计划列表
 ```
   
-* **发起订阅**
-  
-可以参考`demo.py`中`subscribe`  
-  
-**原型**
-  
-通过`BCPay`的实例，以`subscribe`方法，结合`BCSubscription`参数、`sms_id`和`sms_code`发起，结果包含`BCSubscription`对象，如果该对象`valid`为`True`表明本次订阅已经即时生效，否则你还需要等待webhook推送最终审核结果；  
-`sms_id`和`sms_code`的获取查看获取验证码方法的说明
-  
-**调用**
-  
-```python
-param = BCSubscription()
-param.buyer_id = 'your_system_buyer_id'
-param.plan_id = 'plan_id'
-param.bank_name = 'choose_from_subscription_payment_supported_banks'
-param.card_no = 'bank_card_number'
-param.id_name = 'name_on_id_card'
-param.id_no = 'id_card_number'
-# 和银行卡绑定的手机号
-param.mobile = 'mobile_number'
-result = bc_pay.subscribe(param, 'sms_id_get_by_send_sms_passcode', 'sms_code_from_user_phone')
-# 如果请求成功，result.subscription为创建的订阅对象
-```
-  
 * **订阅支付支持的银行列表**
   
 可以参考`demo.py`中`subscription_supported_banks`  
@@ -461,6 +436,31 @@ result = bc_query.query_subscription_payment_supported_banks()
 ```python
 result = bc_pay.send_sms_passcode(mobile)
 # 如果请求成功，result.sms_id为本次验证码id
+```
+  
+* **发起订阅**
+  
+可以参考`demo.py`中`subscribe`  
+  
+**原型**
+  
+通过`BCPay`的实例，以`subscribe`方法，结合`BCSubscription`参数、`sms_id`和`sms_code`发起，结果包含`BCSubscription`对象，如果该对象`valid`为`True`表明本次订阅已经即时生效，否则你还需要等待webhook推送最终审核结果；  
+`sms_id`和`sms_code`的获取查看获取验证码方法的说明
+  
+**调用**
+  
+```python
+param = BCSubscription()
+param.buyer_id = 'your_system_buyer_id'
+param.plan_id = 'plan_id'
+param.bank_name = 'choose_from_subscription_payment_supported_banks'
+param.card_no = 'bank_card_number'
+param.id_name = 'name_on_id_card'
+param.id_no = 'id_card_number'
+# 和银行卡绑定的手机号
+param.mobile = 'mobile_number'
+result = bc_pay.subscribe(param, 'sms_id_get_by_send_sms_passcode', 'sms_code_from_user_phone')
+# 如果请求成功，result.subscription为创建的订阅对象
 ```
   
 * **取消订阅**
