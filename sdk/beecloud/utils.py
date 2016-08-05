@@ -353,7 +353,7 @@ def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
     query object list by conditions
     :param bc_app: used to attach app sign
     :param url: do NOT contain params at the end
-    :param query_param: query condition object beecloud.entity.BCQueryLimit,
+    :param query_param: query condition object beecloud.entity.BCQueryCriteria,
                         more specific conditions can be attached to it
     :param json_obj_name: like 'plans' for plan list query
     :param object_type: object type like beecloud.entity.BCPlan

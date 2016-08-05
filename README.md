@@ -399,7 +399,7 @@ result = bc_query.query_refund_status(channel, refund_no)
   
 **原型**
   
-通过`BCQuery`的实例，以`query_plans`方法，结合`BCQueryLimit`参数查询，结果包含`BCPlan`的列表；如果设置了`BCQueryLimit count_only`为`True`，那么结果只包含满足条件的个数`total_count`  
+通过`BCQuery`的实例，以`query_plans`方法，结合`BCQueryCriteria`参数查询，结果包含`BCPlan`的列表；如果设置了`BCQueryCriteria count_only`为`True`，那么结果只包含满足条件的个数`total_count`  
   
 **调用**
   
@@ -484,13 +484,13 @@ result = bc_pay.cancel_subscription(sid)
   
 **原型**
   
-通过`BCQuery`的实例，以`query_subscriptions`方法，结合`BCQueryLimit`参数查询，结果包含`BCSubscription`的列表；如果设置了`BCQueryLimit count_only`为`True`，那么结果只包含满足条件的个数`total_count`  
+通过`BCQuery`的实例，以`query_subscriptions`方法，结合`BCQueryCriteria`参数查询，结果包含`BCSubscription`的列表；如果设置了`BCQueryCriteria count_only`为`True`，那么结果只包含满足条件的个数`total_count`  
   
 **调用**
   
 ```python
 # 自定义你的查询条件
-# param = BCQueryLimit()
+# param = BCQueryCriteria()
 # param.limit = 8
 # param.buyer_id = 'xz'
 result = bc_query.query_subscriptions()

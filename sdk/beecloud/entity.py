@@ -198,7 +198,7 @@ class BCQueryReqParams:
 
 
 # 不可用于订单和退款的查询！！！
-class BCQueryLimit:
+class BCQueryCriteria:
     def __init__(self):
         # query objects created before or equal to the given UNIX timestamp in ms
         self.created_before = None

@@ -13,7 +13,7 @@ from beecloud.query import BCQuery
 from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
-    BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryLimit
+    BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryCriteria
 import json
 
 app = Flask(__name__)
@@ -394,7 +394,7 @@ def subscription_supported_banks():
 @app.route('/subscription/plans')
 def subscription_plans():
     # 自定义你的查询条件
-    param = BCQueryLimit()
+    param = BCQueryCriteria()
     param.limit = 15
     result = bc_query.query_plans(param)
     if not result.result_code:
@@ -421,7 +421,7 @@ def sms():
 @app.route('/subscriptions')
 def subscriptions():
     # 自定义你的查询条件
-    # param = BCQueryLimit()
+    # param = BCQueryCriteria()
     # param.buyer_id = 'xz'
     # 作为query_subscriptions的参数
 
