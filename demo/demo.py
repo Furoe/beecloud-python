@@ -394,9 +394,9 @@ def subscription_supported_banks():
 @app.route('/subscription/plans')
 def subscription_plans():
     # 自定义你的查询条件
-    # param = BCQueryLimit()
-    # param.limit = 8
-    result = bc_query.query_plans()
+    param = BCQueryLimit()
+    param.limit = 15
+    result = bc_query.query_plans(param)
     if not result.result_code:
         data = [{'id': plan.id, 'name': plan.name} for plan in result.plans if plan.valid]
         return json.dumps(data)
@@ -423,6 +423,7 @@ def subscriptions():
     # 自定义你的查询条件
     # param = BCQueryLimit()
     # param.buyer_id = 'xz'
+    # 作为query_subscriptions的参数
 
     result = bc_query.query_subscriptions()
     return render_template('subscriptions.html', subscriptions=result.subscriptions)
