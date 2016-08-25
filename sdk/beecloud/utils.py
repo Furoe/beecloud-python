@@ -415,6 +415,35 @@ def rest_query_object_by_id(bc_app, url, obj_id, json_obj_name, object_type):
 
 # ======== BeeCloud restful object CURD end ========
 
+
+def send_sms_passcode(bc_app, phone):
+    """
+    send sms verify code
+    :param bc_app: beecloud.entity.BCApp
+    :param phone: phone number passcode sent to
+    :return: beecloud.entity.BCResult, which contains sms_id
+    """
+    tmp_obj = _TmpObject()
+    tmp_obj.phone = phone
+    attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
+    tmp_resp = http_post(get_rest_root_url() + "sms", tmp_obj, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        bc_result.sms_id = resp_dict.get('sms_id')
+
+    return bc_result
+
+
 wx_oauth_url_basic = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
 wx_sns_token_url_basic = 'https://api.weixin.qq.com/sns/oauth2/access_token?'
 

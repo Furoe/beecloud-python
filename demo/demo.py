@@ -10,7 +10,9 @@ import datetime
 # 实际项目中建议按需import
 from beecloud.pay import BCPay
 from beecloud.query import BCQuery
-from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
+from beecloud.subscribe import BCSubscribe
+from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id, \
+    send_sms_passcode
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
     BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryCriteria
@@ -37,6 +39,9 @@ bc_pay.register_app(bc_app)
 
 bc_query = BCQuery()
 bc_query.register_app(bc_app)
+
+bc_subscribe = BCSubscribe()
+bc_subscribe.register_app(bc_app)
 
 
 @app.route('/')
@@ -102,8 +107,10 @@ def _deal_with_normal_pay(channel, open_id, bank=None):
     if not bc_app.is_test_mode and req_params.channel == BCChannelType.WX_NATIVE:
         return render_template('qrcode.html', raw_content=resp.code_url)
     elif hasattr(resp, 'url') and resp.url:
+        print(resp.url)
         return redirect(resp.url)
     elif hasattr(resp, 'html') and resp.html:
+        print(resp.html)
         return render_template('blank.html', content=Markup(resp.html))
     elif req_params.channel == BCChannelType.WX_JSAPI:
         jsapi = {}
@@ -375,7 +382,7 @@ def subscribe():
         if not k.startswith('sms'):
             setattr(param, k, v)
 
-    result = bc_pay.subscribe(param, request.form['sms_id'], request.form['sms_code'])
+    result = bc_subscribe.subscribe(param, request.form['sms_id'], request.form['sms_code'])
     if result.result_code:
         return u'订阅失败：' + result.result_msg + " | " + result.err_detail
     else:
@@ -408,7 +415,7 @@ def subscription_plans():
 def sms():
     mobile = request.args.get('mobile')
     print(mobile)
-    result = bc_pay.send_sms_passcode(mobile)
+    result = send_sms_passcode(bc_app, mobile)
     if not result.result_code:
         print('sms id:' + result.sms_id)
         return result.sms_id
@@ -421,11 +428,11 @@ def sms():
 @app.route('/subscriptions')
 def subscriptions():
     # 自定义你的查询条件
-    # param = BCQueryCriteria()
-    # param.buyer_id = 'xz'
+    param = BCQueryCriteria()
+    param.buyer_id = 'xz1'
     # 作为query_subscriptions的参数
 
-    result = bc_query.query_subscriptions()
+    result = bc_query.query_subscriptions(param)
     return render_template('subscriptions.html', subscriptions=result.subscriptions)
 
 
@@ -435,7 +442,7 @@ def cancel_subscription():
     if not sid:
         return ''
 
-    result = bc_pay.cancel_subscription(sid)
+    result = bc_subscribe.cancel_subscription(sid)
     if result.result_code:
         return 'cancel failed, reason: ' + result.result_msg + ' | ' + result.err_detail
     else:
