@@ -3,6 +3,7 @@ BeeCloud Python Changelog
 v3.3.0 发布日期：2016年7月7日
 根据rest API升级错误处理
 添加订阅支付
+添加BC_NATIVE支付渠道和鉴权接口
 
 v3.2.0 发布日期：2016年6月8日
 + 比可企业打款支持的银行列表查询API：query_bc_transfer_supported_banks
