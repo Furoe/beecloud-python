@@ -7,3 +7,4 @@ sdk/beecloud.egg-info/*
 sdk/dist/*
 sdk/build/*
 tests/.idea/*
+*.pyc

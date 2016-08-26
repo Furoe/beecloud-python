@@ -104,7 +104,7 @@ def _deal_with_normal_pay(channel, open_id, bank=None):
 
     print("beecloud bill object id: " + resp.id)
 
-    if not bc_app.is_test_mode and req_params.channel == BCChannelType.WX_NATIVE:
+    if not bc_app.is_test_mode and req_params.channel in [BCChannelType.WX_NATIVE, BCChannelType.BC_NATIVE]:
         return render_template('qrcode.html', raw_content=resp.code_url)
     elif hasattr(resp, 'url') and resp.url:
         print(resp.url)

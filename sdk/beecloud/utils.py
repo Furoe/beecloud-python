@@ -444,6 +444,44 @@ def send_sms_passcode(bc_app, phone):
     return bc_result
 
 
+# 鉴权
+def verify_card_factors(bc_app, name, id_no, card_no, mobile=None):
+    """
+    verify bank card factors
+    :param bc_app: beecloud.entity.BCApp
+    :param name: id card name
+    :param id_no: id card number
+    :param card_no: bank card number
+    :param mobile: mobile bind to bank card
+    :return:
+    """
+    tmp_obj = _TmpObject()
+    tmp_obj.name = name
+    tmp_obj.id_no = id_no
+    tmp_obj.card_no = card_no
+    tmp_obj.mobile = mobile
+
+    attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
+    tmp_resp = http_post(get_rest_root_url() + "auth", tmp_obj, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        bc_result.card_id = resp_dict.get('card_id')
+        bc_result.auth_result = resp_dict.get('auth_result')
+        bc_result.auth_msg = resp_dict.get('auth_msg')
+
+    return bc_result
+
+
 wx_oauth_url_basic = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
 wx_sns_token_url_basic = 'https://api.weixin.qq.com/sns/oauth2/access_token?'
 

@@ -71,8 +71,8 @@ class BCPay:
             # most channel will return url or html
             bc_result.html = resp_dict.get('html')
             bc_result.url = resp_dict.get('url')
-            # WX_NATIVE
-            if pay_params.channel == BCChannelType.WX_NATIVE:
+            # WX_NATIVE or BC_NATIVE
+            if pay_params.channel in [BCChannelType.WX_NATIVE, BCChannelType.BC_NATIVE]:
                 bc_result.code_url = resp_dict.get('code_url')
             # WX_JSAPI
             if pay_params.channel == BCChannelType.WX_JSAPI:

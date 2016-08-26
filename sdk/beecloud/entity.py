@@ -89,6 +89,7 @@ class BCChannelType:
     BC_APP = 'BC_APP'
     BC_EXPRESS = 'BC_EXPRESS'
     BC_TRANSFER = 'BC_TRANSFER'
+    BC_NATIVE = 'BC_NATIVE'
 
 
 class BCReqType:
