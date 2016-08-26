@@ -299,11 +299,11 @@ class BCQuery:
         query bc_gateway supported banks
         :return: map, keys as bank abbr, value as bank name
         """
-        return {'CMB': '招商银行', 'ICBC': '工商银行', 'BOC': '中国银行', 'ABC': '农业银行',
-                'BOCM': '交通银行', 'SPDB': '浦发银行', 'GDB': '广发银行', 'CITIC': '中信银行',
-                'CEB': '光大银行', 'CIB': '兴业银行', 'SDB': '平安银行', 'CMBC': '民生银行',
-                'BEA': '东亚银行', 'BOB': '北京银行', 'SRCB': '上海农商行', 'NJCB': '南京银行',
-                'NBCB': '宁波银行'}
+        return {u'CMB': u'招商银行', u'ICBC': u'工商银行', u'BOC': u'中国银行', u'ABC': u'农业银行',
+                u'BOCM': u'交通银行', u'SPDB': u'浦发银行', u'GDB': u'广发银行', u'CITIC': u'中信银行',
+                u'CEB': u'光大银行', u'CIB': u'兴业银行', u'SDB': u'平安银行', u'CMBC': u'民生银行',
+                u'BEA': u'东亚银行', u'BOB': u'北京银行', u'SRCB': u'上海农商行', u'NJCB': u'南京银行',
+                u'NBCB': u'宁波银行'}
 
     def query_plans(self, query_param=None):
         """
