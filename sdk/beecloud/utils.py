@@ -445,7 +445,7 @@ def send_sms_passcode(bc_app, phone):
 
 
 # 鉴权
-def verify_card_factors(bc_app, name, id_no, card_no, mobile=None):
+def verify_card_factors(bc_app, name, id_no, card_no=None, mobile=None):
     """
     verify bank card factors
     :param bc_app: beecloud.entity.BCApp

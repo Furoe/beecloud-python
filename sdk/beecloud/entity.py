@@ -90,6 +90,8 @@ class BCChannelType:
     BC_EXPRESS = 'BC_EXPRESS'
     BC_TRANSFER = 'BC_TRANSFER'
     BC_NATIVE = 'BC_NATIVE'
+    BC_WX_WAP = 'BC_WX_WAP'
+    BC_ALI_QRCODE = 'BC_ALI_QRCODE'
 
 
 class BCReqType:

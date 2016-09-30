@@ -497,6 +497,17 @@ result = bc_query.query_subscriptions()
 # 如果查询成功，result.subscriptions为查询到的计划列表
 ```
   
+### 14.鉴权
+调用`beecloud.utils`中`verify_card_factors`方法，依次传入参数`BCApp`实例、姓名、身份证号、银行卡号、银行预留手机号做四要素鉴权，手机号不传入则三要素鉴权，银行卡号也不传入则二要素鉴权  
+```python
+result = verify_card_factors(bc_app,
+                             'name',
+                             'id card number',
+                             'bank card number',
+                             'phone number')
+```
+result中result_code为0表示鉴权成功。
+
 
 ## Demo
 项目中的`demo`工程<br>
