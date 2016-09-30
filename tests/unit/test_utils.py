@@ -49,8 +49,8 @@ class UtilsTestCase(unittest.TestCase):
         # error case: 404
         requests_mock_method.side_effect = None
         resp = requests.Response()
-        resp.status_code = 404
-        resp.reason = 'not found'
+        resp.status_code = 500
+        resp.reason = 'internal error'
         requests_mock_method.return_value = resp
         if req_param:
             result = api_method(url, req_param)
@@ -58,8 +58,8 @@ class UtilsTestCase(unittest.TestCase):
             result = api_method(url)
         assert result[0] == URL_REQ_FAIL
         assert result[1].result_code == NETWORK_ERROR_CODE
-        assert result[1].result_msg == 404
-        assert result[1].err_detail == 'not found'
+        assert result[1].result_msg == 500
+        assert result[1].err_detail == 'internal error'
 
         # succ case
         resp.status_code = 200

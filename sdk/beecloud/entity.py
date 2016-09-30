@@ -89,6 +89,9 @@ class BCChannelType:
     BC_APP = 'BC_APP'
     BC_EXPRESS = 'BC_EXPRESS'
     BC_TRANSFER = 'BC_TRANSFER'
+    BC_NATIVE = 'BC_NATIVE'
+    BC_WX_WAP = 'BC_WX_WAP'
+    BC_ALI_QRCODE = 'BC_ALI_QRCODE'
 
 
 class BCReqType:
@@ -194,6 +197,25 @@ class BCQueryReqParams:
         self.skip = None
 
         # 查询的条数
+        self.limit = None
+
+
+# 不可用于订单和退款的查询！！！
+class BCQueryCriteria:
+    def __init__(self):
+        # query objects created before or equal to the given UNIX timestamp in ms
+        self.created_before = None
+
+        # query objects created after or equal to the given UNIX timestamp in ms
+        self.created_after = None
+
+        # If count_only is true, only the total count of all objects that match your filters will be returned
+        self.count_only = None
+
+        # skip some objects for pagination
+        self.skip = None
+
+        # limit the number of objects
         self.limit = None
 
 
@@ -444,6 +466,89 @@ class BCPayPalCreditCard:
 
         # 卡类别
         self.card_type = None
+
+
+class BCPlan:
+    def __init__(self):
+        # 订阅计划的唯一标识
+        self.id = None
+
+        # 扣款单价
+        self.fee = None
+
+        # 扣款周期:day, week, month or year.
+        self.interval = None
+
+        # 计划名
+        self.name = None
+
+        # ISO货币名，如'CNY'
+        self.currency = None
+
+        # 如果是3，那么每3个interval扣款，订阅系统默认1
+        self.interval_count = None
+
+        # 试用天数
+        self.trial_days = None
+
+        # dict类型的额外信息
+        self.optional = None
+
+        # 计划是否生效，查询时返回
+        self.valid = None
+
+
+class BCSubscription:
+    def __init__(self):
+        # 订阅记录的唯一标识
+        self.id = None
+
+        # 订阅的buyer ID，可以是用户email，也可以是商户系统中的用户ID
+        self.buyer_id = None
+
+        # 订阅计划id
+        self.plan_id = None
+
+        # 由{订阅用户银行名称、订阅用户银行卡号、订阅用户身份证姓名、订阅用户身份证号、订阅用户银行预留手机号}的组合确定
+        # 实际发起订阅请求时可以直接使用该id，或者以上的组合
+        self.card_id = None
+
+        # 订阅用户银行名称
+        self.bank_name = None
+
+        # 订阅用户银行卡号
+        self.card_no = None
+
+        # 订阅用户身份证姓名
+        self.id_name = None
+
+        # 订阅用户身份证号
+        self.id_no = None
+
+        # 订阅用户银行预留手机号
+        self.mobile = None
+
+        # 每次扣款总额为 订阅计划的金额 * amount，订阅系统默认为1
+        self.amount = None
+
+        # 优惠标识id
+        self.coupon_id = None
+
+        # 试用截止时间戳
+        self.trial_end = None
+
+        # dict类型的额外信息
+        self.optional = None
+
+        # 订阅用户银行卡号后四位，查询时返回
+        self.last4 = None
+
+        # 订阅状态，查询时返回
+        self.status = None
+
+        # 订阅是否已经生效，查询时返回
+        self.valid = None
+
 
 class _TmpObject:
     pass

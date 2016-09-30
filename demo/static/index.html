@@ -78,6 +78,14 @@
             q_form.attr("action", '/query_pre_refunds');
             q_form.submit();
         }
+
+        function forward_subscribe() {
+            window.open("/static/subscribe.html")
+        }
+
+        function query_subscriptions() {
+            window.open("/subscriptions")
+        }
     </script>
 </head>
 <body>
@@ -94,6 +102,14 @@
             <li onclick="switch_img(this)">
                 <input type="radio" value="WX_NATIVE" name="channel">
                 <img src="http://beeclouddoc.qiniudn.com/wechats.png" alt="">
+            </li>
+            <li onclick="switch_img(this)">
+                <input type="radio" value="BC_NATIVE" name="channel">
+                <img src="http://beeclouddoc.qiniudn.com/icon-bcwxsm.png" alt="">
+            </li>
+            <li onclick="switch_img(this)">
+                <input type="radio" value="BC_ALI_QRCODE" name="channel">
+                <img src="http://beeclouddoc.qiniudn.com/icon-bcalism.png" alt="">
             </li>
             <li onclick="switch_img(this)">
                 <input type="radio" value="WX_JSAPI" name="channel">
@@ -157,11 +173,11 @@
             </li>
             <li onclick="switch_img(this)">
                 <input type="radio" value="BC_GATEWAY" name="channel">
-                <img src="static/gateway_pay.png" alt="BC GATEWAY">
+                <img src="http://7xavqo.com1.z0.glb.clouddn.com/icon_gateway.png" alt="BC GATEWAY">
             </li>
             <li onclick="switch_img(this)">
                 <input type="radio" value="BC_EXPRESS" name="channel">
-                <img src="static/bc_express.png" alt="BC EXPRESS">
+                <img src="http://beeclouddoc.qiniudn.com/icon_BcExpress.png" alt="BC EXPRESS">
             </li>
             <!--
             <li onclick="switch_img(this)">
@@ -179,6 +195,16 @@
         <input type="submit" class="button" value="确认付款">
     </div>
 </form>
+
+<hr style="width:100%;margin-top:30px;"/>
+
+    <div style="clear:both;width:200px;margin:0 auto;">
+        <input onclick="forward_subscribe()" type="button" class="button" value="订阅支付">
+    </div>
+
+    <div style="clear:both;width:200px;margin:0 auto;">
+        <input onclick="query_subscriptions()" type="button" class="button" value="查看所有的订阅">
+    </div>
 
 <hr style="width:100%;margin-top:30px;"/>
 

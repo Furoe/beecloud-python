@@ -9,7 +9,7 @@
 """
 
 from beecloud.entity import BCChannelType, BCResult, BCReqType
-from beecloud.utils import get_random_host, http_post, http_put, set_common_attr, \
+from beecloud.utils import get_rest_root_url, http_post, http_put, set_common_attr, \
     report_not_supported_err, obj_to_dict, attach_app_sign
 
 
@@ -26,30 +26,30 @@ class BCPay:
 
     def _bill_pay_url(self):
         if self.bc_app.is_test_mode:
-            return get_random_host() + 'rest/sandbox/bill'
+            return get_rest_root_url() + 'rest/sandbox/bill'
         else:
-            return get_random_host() + 'rest/bill'
+            return get_rest_root_url() + 'rest/bill'
 
     def _international_pay_url(self):
-        return get_random_host() + 'rest/international/bill'
+        return get_rest_root_url() + 'rest/international/bill'
 
     def _bill_refund_url(self):
-        return get_random_host() + 'rest/refund'
+        return get_rest_root_url() + 'rest/refund'
 
     def _bill_transfer_url(self):
-        return get_random_host() + 'rest/transfer'
+        return get_rest_root_url() + 'rest/transfer'
 
     def _bc_transfer_url(self):
-        return get_random_host() + 'rest/bc_transfer'
+        return get_rest_root_url() + 'rest/bc_transfer'
 
     def _batch_transfer_url(self):
-        return get_random_host() + 'rest/transfers'
+        return get_rest_root_url() + 'rest/transfers'
 
     def pay(self, pay_params):
         """
         payment API, different channels have different requirements for request params
         and the return params varies.
-        refer to restful API https://beecloud.cn/doc/ #2
+        refer to restful API https://beecloud.cn/doc/?index=rest-api #2
         :param pay_params: beecloud.entity.BCPayReqParams
         :return: beecloud.entity.BCResult
         """
@@ -69,10 +69,12 @@ class BCPay:
         if not bc_result.result_code:
             bc_result.id = resp_dict.get('id')
             # most channel will return url or html
-            bc_result.html = resp_dict.get('html')
-            bc_result.url = resp_dict.get('url')
-            # WX_NATIVE
-            if pay_params.channel == BCChannelType.WX_NATIVE:
+            if resp_dict.get('html'):
+                bc_result.html = resp_dict.get('html')
+            if resp_dict.get('url'):
+                bc_result.url = resp_dict.get('url')
+            # WX_NATIVE or BC_NATIVE or BC_ALI_QRCODE
+            if resp_dict.get('code_url'):
                 bc_result.code_url = resp_dict.get('code_url')
             # WX_JSAPI
             if pay_params.channel == BCChannelType.WX_JSAPI:
@@ -90,7 +92,7 @@ class BCPay:
         refund API, refund fee should not be greater than bill total fee;
         need_approval is for pre refund, you have to call [audit_pre_refunds] later on to execute real refund
         if the bill is paid with ali, you have to input your password on the returned url page
-        refer to restful API https://beecloud.cn/doc/ #3
+        refer to restful API https://beecloud.cn/doc/?index=rest-api #3
         :param refund_params: beecloud.entity.BCRefundReqParams
         :return: beecloud.entity.BCResult
         """
@@ -121,7 +123,7 @@ class BCPay:
         batch manage pre refunds;
         pre refund id list is required;
         each refund result is kept in result_map
-        refer to restful API https://beecloud.cn/doc/ #4
+        refer to restful API https://beecloud.cn/doc/?index=rest-api #4
         :param pre_refund_params: beecloud.entity.BCPreRefundReqParams
         :return: beecloud.entity.BCResult
         """
@@ -180,7 +182,7 @@ class BCPay:
     def bc_transfer(self, transfer_params):
         """
         for BeeCloud transfer via bank card
-        refer to https://beecloud.cn/doc/?index=2
+        refer to https://beecloud.cn/doc/?index=rest-api-transfer
         :param transfer_params: beecloud.entity.BCCardTransferParams
         :return: beecloud.entity.BCResult
         """
@@ -191,7 +193,7 @@ class BCPay:
     def transfer(self, transfer_params):
         """
         for WX_REDPACK, WX_TRANSFER, ALI_TRANSFER
-        refer to https://beecloud.cn/doc/?index=2
+        refer to https://beecloud.cn/doc/?index=rest-api-transfer
         redpack_info should be type of beecloud.entity.BCTransferRedPack
         :param transfer_params: beecloud.entity.BCTransferReqParams
         :return: beecloud.entity.BCResult
@@ -203,7 +205,7 @@ class BCPay:
     def batch_transfer(self, transfer_params):
         """
         batch transfer, currently only ALI is supported
-        refer to https://beecloud.cn/doc/?index=2
+        refer to https://beecloud.cn/doc/?index=rest-api-transfer
         transfer_data should be type of beecloud.entity.BCBatchTransferItem
         :param transfer_params: beecloud.entity.BCBatchTransferParams
         :return: beecloud.entity.BCResult

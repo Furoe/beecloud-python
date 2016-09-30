@@ -8,7 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from beecloud.entity import BCResult, BCReqType
+from beecloud.entity import BCResult, BCReqType, _TmpObject
 from beecloud import BEECLOUD_HOSTS, BEECLOUD_RESTFUL_VERSION, NETWORK_ERROR_CODE, NETWORK_ERROR_NAME, \
     NOT_SUPPORTED_CODE, NOT_SUPPORTED_NAME
 import random
@@ -26,16 +26,18 @@ if sys.version_info[0] == 3:   # if 3
 else:
     import urllib
 
-
 URL_REQ_SUCC = 1
 URL_REQ_FAIL = 0
 
 
-def get_random_host():
+def get_rest_root_url():
     return BEECLOUD_HOSTS[random.randint(0, len(BEECLOUD_HOSTS)-1)] + BEECLOUD_RESTFUL_VERSION
 
 
 def obj_to_dict(obj):
+    if not obj:
+        return None
+
     return {k: v for (k, v) in obj.__dict__.items() if v is not None}
 
 
@@ -60,9 +62,14 @@ def _http_req_with_params(url, obj, method='POST', timeout=None):
     except requests.exceptions.ConnectionError:
         return _deal_with_conn_error()
 
-    if http_resp.status_code == 200:
+    if http_resp.status_code == 200 or (400 <= http_resp.status_code < 500):
         http_resp.encoding = 'UTF-8'
-        return URL_REQ_SUCC, http_resp.json()
+        try:
+            result_json = http_resp.json()
+        except ValueError:
+            return _deal_with_invalid_resp(http_resp)
+        else:
+            return URL_REQ_SUCC, result_json
     else:
         return _deal_with_invalid_resp(http_resp)
 
@@ -97,21 +104,73 @@ def obj_to_quote_str(param_obj):
         return urllib.quote_plus(str_tmp)
 
 
-def http_get(url, timeout=None):
+def parse_dict_to_obj(dict_data, class_name):
+    obj = class_name()
+
+    if dict_data:
+        for k, v in dict_data.items():
+            obj.__dict__[k] = v
+
+    return obj
+
+
+# result would be key1=val1&key2=val2, value would utf8 encode
+def compatible_urlencode(pair_data):
+    dict_data = pair_data
+    if type(pair_data) is not dict:
+        dict_data = obj_to_dict(pair_data)
+
+    if sys.version_info[0] == 3:
+        return urllib.parse.urlencode(dict_data)
+    else:
+        return urllib.urlencode(dict_data)
+
+
+def http_get(url, timeout=None, params=None):
     """
     http get request
+    :param url: url with params concatenated(params should not set in this case) or not
+    :param timeout: refer to desc of BCApp timeout
+    :param params: dict type, attach at the end of url, ? will be auto added
+    :return: tuple, [0] indicate the result code: 0 means failure, 1 means success; [1] is beecloud.entity.BCResult
+    """
+    try:
+        http_resp = requests.get(url, params=params, timeout=timeout)
+    except requests.exceptions.ConnectionError:
+        return _deal_with_conn_error()
+
+    if http_resp.status_code == 200 or (400 <= http_resp.status_code < 500):
+        http_resp.encoding = 'UTF-8'
+        try:
+            result_json = http_resp.json()
+        except ValueError:
+            return _deal_with_invalid_resp(http_resp)
+        else:
+            return URL_REQ_SUCC, result_json
+    else:
+        return _deal_with_invalid_resp(http_resp)
+
+
+def http_del(url, timeout=None):
+    """
+    http delete request
     :param url: url with params concatenated
     :param timeout: refer to desc of BCApp timeout
     :return: tuple, [0] indicate the result code: 0 means failure, 1 means success; [1] is beecloud.entity.BCResult
     """
     try:
-        http_resp = requests.get(url, timeout=timeout)
+        http_resp = requests.delete(url, timeout=timeout)
     except requests.exceptions.ConnectionError:
         return _deal_with_conn_error()
 
-    if http_resp.status_code == 200:
+    if http_resp.status_code == 200 or (400 <= http_resp.status_code < 500):
         http_resp.encoding = 'UTF-8'
-        return URL_REQ_SUCC, http_resp.json()
+        try:
+            result_json = http_resp.json()
+        except ValueError:
+            return _deal_with_invalid_resp(http_resp)
+        else:
+            return URL_REQ_SUCC, result_json
     else:
         return _deal_with_invalid_resp(http_resp)
 
@@ -162,12 +221,12 @@ def attach_app_sign(req_param, req_type, bc_app):
     if not bc_app.app_id:
         raise ValueError('app id is not set')
 
-    req_param.app_id = bc_app.app_id
+    setattr(req_param, 'app_id', bc_app.app_id)
 
     # 签名生成时间
     # 时间戳, 毫秒数
     timestamp = long(time.time()*1000)
-    req_param.timestamp = timestamp
+    setattr(req_param, 'timestamp', timestamp)
 
     # 加密签名
     # 算法: md5(app_id+timestamp+secret), 32位16进制格式, 不区分大小写
@@ -175,21 +234,254 @@ def attach_app_sign(req_param, req_type, bc_app):
         if not bc_app.test_secret:
             raise ValueError('test secret is not set')
         else:
-            req_param.app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
-                                              bc_app.test_secret).encode('UTF-8')).hexdigest()
+            app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
+                                    bc_app.test_secret).encode('UTF-8')).hexdigest()
     else:
         if req_type in (BCReqType.REFUND, BCReqType.TRANSFER):
             if not bc_app.master_secret:
                 raise ValueError('master secret is not set')
             else:
-                req_param.app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
-                                                  bc_app.master_secret).encode('UTF-8')).hexdigest()
+                app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
+                                        bc_app.master_secret).encode('UTF-8')).hexdigest()
         else:
             if not bc_app.app_secret:
                 raise ValueError('app secret is not set')
             else:
-                req_param.app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
-                                                  bc_app.app_secret).encode('UTF-8')).hexdigest()
+                app_sign = hashlib.md5((bc_app.app_id + str(timestamp) +
+                                        bc_app.app_secret).encode('UTF-8')).hexdigest()
+
+    setattr(req_param, 'app_sign', app_sign)
+
+
+# ======== BeeCloud restful object CURD start ========
+
+def rest_add_object(bc_app, url, obj, json_obj_name, obj_type):
+    """
+    :param bc_app: used to attach app sign
+    :param url: used to post request
+    :param obj: like beecloud.entity.BCPlan
+    :param json_obj_name: object json name returned when successful, like 'plan'
+    :param obj_type: like beecloud.entity.BCPlan
+    :return: beecloud.entity.BCResult
+    """
+    attach_app_sign(obj, BCReqType.PAY, bc_app)
+    tmp_resp = http_post(url, obj, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+    if not bc_result.result_code:
+        setattr(bc_result, json_obj_name, parse_dict_to_obj(resp_dict.get(json_obj_name), obj_type))
+
+    return bc_result
+
+
+def rest_update_object(bc_app, url, obj_id, **kwargs):
+    """
+    :param bc_app: used to attach app sign
+    :param url: used to post request
+    :param obj_id: object id
+    :param kwargs: optional key/value pairs arguments
+    :return: beecloud.entity.BCResult
+    """
+    tmp_obj = _TmpObject()
+    if kwargs:
+        for k, v in kwargs.items():
+            if v:
+                setattr(tmp_obj, k, v)
+
+    attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
+    tmp_resp = http_put(url + '/' + obj_id, tmp_obj, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        bc_result.id = resp_dict.get('id')
+
+    return bc_result
+
+
+def rest_delete_object(bc_app, url, obj_id, **kwargs):
+    """
+    :param bc_app: used to attach app sign
+    :param url: used to post request
+    :param obj_id: object id
+    :param kwargs: optional key/value pairs arguments
+    :return: beecloud.entity.BCResult
+    """
+    tmp_obj = _TmpObject()
+    if kwargs:
+        for k, v in kwargs.items():
+            if v:
+                setattr(tmp_obj, k, v)
+
+    attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
+    req_url = url + '/' + obj_id + '?' + compatible_urlencode(tmp_obj)
+    tmp_resp = http_del(req_url, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        bc_result.id = resp_dict.get("id")
+
+    return bc_result
+
+
+def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
+    """
+    query object list by conditions
+    :param bc_app: used to attach app sign
+    :param url: do NOT contain params at the end
+    :param query_param: query condition object beecloud.entity.BCQueryCriteria,
+                        more specific conditions can be attached to it
+    :param json_obj_name: like 'plans' for plan list query
+    :param object_type: object type like beecloud.entity.BCPlan
+    :return: beecloud.entity.BCResult
+    """
+    if not query_param:
+        query_param = _TmpObject()
+
+    attach_app_sign(query_param, BCReqType.QUERY, bc_app)
+    tmp_resp = http_get(url, bc_app.timeout, obj_to_dict(query_param))
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+    if not bc_result.result_code:
+        # if only query count
+        if hasattr(query_param, 'count_only') and query_param.count_only:
+            bc_result.total_count = resp_dict.get('total_count')
+        else:
+            if resp_dict.get(json_obj_name):
+                setattr(bc_result, json_obj_name, [parse_dict_to_obj(dict_data, object_type)
+                                                   for dict_data in resp_dict.get(json_obj_name) if dict_data])
+            else:
+                setattr(bc_result, json_obj_name, [])
+
+    return bc_result
+
+
+def rest_query_object_by_id(bc_app, url, obj_id, json_obj_name, object_type):
+    """
+    query object by id
+    :param bc_app: used to attach app sign
+    :param url: do NOT contain params at the end
+    :param obj_id: object id
+    :param json_obj_name: like 'plan' for plan query
+    :param object_type: object type like beecloud.entity.BCPlan
+    :return: beecloud.entity.BCResult
+    """
+    query_param = _TmpObject()
+    attach_app_sign(query_param, BCReqType.QUERY, bc_app)
+    tmp_resp = http_get(url + '/' + obj_id, bc_app.timeout, obj_to_dict(query_param))
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        setattr(bc_result, json_obj_name, parse_dict_to_obj(resp_dict.get(json_obj_name), object_type))
+
+    return bc_result
+
+# ======== BeeCloud restful object CURD end ========
+
+
+def send_sms_passcode(bc_app, phone):
+    """
+    send sms verify code
+    :param bc_app: beecloud.entity.BCApp
+    :param phone: phone number passcode sent to
+    :return: beecloud.entity.BCResult, which contains sms_id
+    """
+    tmp_obj = _TmpObject()
+    tmp_obj.phone = phone
+    attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
+    tmp_resp = http_post(get_rest_root_url() + "sms", tmp_obj, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        bc_result.sms_id = resp_dict.get('sms_id')
+
+    return bc_result
+
+
+# 鉴权
+def verify_card_factors(bc_app, name, id_no, card_no=None, mobile=None):
+    """
+    verify bank card factors
+    :param bc_app: beecloud.entity.BCApp
+    :param name: id card name
+    :param id_no: id card number
+    :param card_no: bank card number
+    :param mobile: mobile bind to bank card
+    :return:
+    """
+    tmp_obj = _TmpObject()
+    tmp_obj.name = name
+    tmp_obj.id_no = id_no
+    tmp_obj.card_no = card_no
+    tmp_obj.mobile = mobile
+
+    attach_app_sign(tmp_obj, BCReqType.PAY, bc_app)
+    tmp_resp = http_post(get_rest_root_url() + "auth", tmp_obj, bc_app.timeout)
+
+    # if err encountered, [0] equals 0
+    if not tmp_resp[0]:
+        return tmp_resp[1]
+
+    # [1] contains result dict
+    resp_dict = tmp_resp[1]
+
+    bc_result = BCResult()
+    set_common_attr(resp_dict, bc_result)
+
+    if not bc_result.result_code:
+        bc_result.card_id = resp_dict.get('card_id')
+        bc_result.auth_result = resp_dict.get('auth_result')
+        bc_result.auth_msg = resp_dict.get('auth_msg')
+
+    return bc_result
+
 
 wx_oauth_url_basic = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
 wx_sns_token_url_basic = 'https://api.weixin.qq.com/sns/oauth2/access_token?'

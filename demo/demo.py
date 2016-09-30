@@ -10,10 +10,12 @@ import datetime
 # 实际项目中建议按需import
 from beecloud.pay import BCPay
 from beecloud.query import BCQuery
-from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id
+from beecloud.subscribe import BCSubscribe
+from beecloud.utils import order_num_on_datetime, local_timestamp_since_epoch, fetch_code, fetch_open_id, \
+    send_sms_passcode
 from beecloud.entity import BCApp, BCPayReqParams, BCRefundReqParams, BCChannelType, BCInternationalPayParams, \
     BCQueryReqParams, BCPreRefundAuditParams, BCBatchTransferParams, BCBatchTransferItem, BCTransferReqParams, \
-    BCTransferRedPack, BCCardTransferParams
+    BCTransferRedPack, BCCardTransferParams, BCSubscription, BCQueryCriteria
 import json
 
 app = Flask(__name__)
@@ -37,6 +39,9 @@ bc_pay.register_app(bc_app)
 
 bc_query = BCQuery()
 bc_query.register_app(bc_app)
+
+bc_subscribe = BCSubscribe()
+bc_subscribe.register_app(bc_app)
 
 
 @app.route('/')
@@ -63,7 +68,7 @@ def app_bill():
     elif channel == 'BC_GATEWAY':
         bank = request.form.get('bank')
         if not bank:
-            return app.send_static_file('choose_bank.html')
+            return render_template('choose_bank.html', banks=bc_query.query_bc_gateway_supported_banks())
         else:
             return _deal_with_normal_pay('BC_GATEWAY', '', bank)
     else:
@@ -99,12 +104,15 @@ def _deal_with_normal_pay(channel, open_id, bank=None):
 
     print("beecloud bill object id: " + resp.id)
 
-    if not bc_app.is_test_mode and req_params.channel == BCChannelType.WX_NATIVE:
-        return render_template('qrcode.html', raw_content=resp.code_url)
-    elif hasattr(resp, 'url') and resp.url:
+    if hasattr(resp, 'url') and resp.url:
+        print(resp.url)
         return redirect(resp.url)
     elif hasattr(resp, 'html') and resp.html:
+        print(resp.html)
         return render_template('blank.html', content=Markup(resp.html))
+    elif hasattr(resp, 'code_url') and resp.code_url:
+        print(resp.code_url)
+        return render_template('qrcode.html', raw_content=resp.code_url)
     elif req_params.channel == BCChannelType.WX_JSAPI:
         jsapi = {}
         jsapi['timeStamp'] = resp.timestamp
@@ -115,6 +123,8 @@ def _deal_with_normal_pay(channel, open_id, bank=None):
         jsapi['paySign'] = resp.pay_sign
         # print(json.dumps(jsapi))
         return render_template('jsapi.html', jsapi=json.dumps(jsapi))
+    else:
+        return "invalid request"
 
 
 def _deal_with_international_pay(channel):
@@ -366,7 +376,81 @@ def app_transfer():
         return redirect(result.url)
 
     return str(result.result_code) + ' # ' + result.result_msg + ' # ' + result.err_detail
-        
+
+
+@app.route('/subscribe', methods=['POST'])
+def subscribe():
+    param = BCSubscription()
+    for k, v in request.form.to_dict().items():
+        if not k.startswith('sms'):
+            setattr(param, k, v)
+
+    result = bc_subscribe.subscribe(param, request.form['sms_id'], request.form['sms_code'])
+    if result.result_code:
+        return u'订阅失败：' + result.result_msg + " | " + result.err_detail
+    else:
+        return u'订阅请求成功，请注意webhook接收最终审核结果：' + result.subscription.id
+
+
+@app.route('/subscription/banks')
+def subscription_supported_banks():
+    result = bc_query.query_subscription_payment_supported_banks()
+    if not result.result_code:
+        return json.dumps(result.common_banks)
+    else:
+        return '[]'
+
+
+@app.route('/subscription/plans')
+def subscription_plans():
+    # 自定义你的查询条件
+    param = BCQueryCriteria()
+    param.limit = 15
+    result = bc_query.query_plans(param)
+    if not result.result_code:
+        data = [{'id': plan.id, 'name': plan.name} for plan in result.plans if plan.valid]
+        return json.dumps(data)
+    else:
+        return '{}'
+
+
+@app.route('/sms')
+def sms():
+    mobile = request.args.get('mobile')
+    print(mobile)
+    result = send_sms_passcode(bc_app, mobile)
+    if not result.result_code:
+        print('sms id:' + result.sms_id)
+        return result.sms_id
+    else:
+        print(result.result_msg)
+        print(result.err_detail)
+        return ''
+
+
+@app.route('/subscriptions')
+def subscriptions():
+    # 自定义你的查询条件
+    param = BCQueryCriteria()
+    param.buyer_id = 'xz1'
+    # 作为query_subscriptions的参数
+
+    result = bc_query.query_subscriptions(param)
+    return render_template('subscriptions.html', subscriptions=result.subscriptions)
+
+
+@app.route('/cancel_subscription')
+def cancel_subscription():
+    sid = request.args.get('sid')
+    if not sid:
+        return ''
+
+    result = bc_subscribe.cancel_subscription(sid)
+    if result.result_code:
+        return 'cancel failed, reason: ' + result.result_msg + ' | ' + result.err_detail
+    else:
+        return 'cancel succ, subscription id: ' + result.id
+
 
 @app.template_filter('format_utc_time')
 def format_utc_time(s):
