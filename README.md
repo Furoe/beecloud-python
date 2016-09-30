@@ -510,8 +510,8 @@ result中result_code为0表示鉴权成功。
 
 
 ## Demo
-项目中的`demo`工程<br>
-1. 请先安装sdk和[Flask](http://flask.pocoo.org/)，请参考`安装`和`依赖`<br/>
+项目中的`demo`工程  
+1. 请先安装sdk和[Flask](http://flask.pocoo.org/)，请参考`安装`和`依赖`  
 2. 运行：cmd进入`demo`文件夹后，运行
 ```shell
 python demo.py
