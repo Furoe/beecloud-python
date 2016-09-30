@@ -7,7 +7,8 @@
 """
 
 BEECLOUD_PYTHON_SDK_VERSION = '3.3.0'
-BEECLOUD_HOST = 'https://apidynamic.beecloud.cn'
+BEECLOUD_HOSTS = ['https://apibj.beecloud.cn', 'https://apisz.beecloud.cn',
+                  'https://apiqd.beecloud.cn', 'https://apihz.beecloud.cn']
 
 BEECLOUD_RESTFUL_VERSION = '/2/'
 

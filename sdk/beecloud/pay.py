@@ -69,10 +69,12 @@ class BCPay:
         if not bc_result.result_code:
             bc_result.id = resp_dict.get('id')
             # most channel will return url or html
-            bc_result.html = resp_dict.get('html')
-            bc_result.url = resp_dict.get('url')
-            # WX_NATIVE or BC_NATIVE
-            if pay_params.channel in [BCChannelType.WX_NATIVE, BCChannelType.BC_NATIVE]:
+            if resp_dict.get('html'):
+                bc_result.html = resp_dict.get('html')
+            if resp_dict.get('url'):
+                bc_result.url = resp_dict.get('url')
+            # WX_NATIVE or BC_NATIVE or BC_ALI_QRCODE
+            if resp_dict.get('code_url'):
                 bc_result.code_url = resp_dict.get('code_url')
             # WX_JSAPI
             if pay_params.channel == BCChannelType.WX_JSAPI:
