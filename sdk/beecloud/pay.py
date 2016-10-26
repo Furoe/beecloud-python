@@ -130,7 +130,7 @@ class BCPay:
         if self.bc_app.is_test_mode:
             return report_not_supported_err('audit_pre_refunds')
 
-        attach_app_sign(pre_refund_params, BCReqType.PAY, self.bc_app)
+        attach_app_sign(pre_refund_params, BCReqType.REFUND, self.bc_app)
         tmp_resp = http_put(self._bill_refund_url(), pre_refund_params, self.bc_app.timeout)
 
         # if err encountered, [0] equals 0
