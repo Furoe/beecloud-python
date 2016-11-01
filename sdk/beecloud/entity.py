@@ -37,6 +37,7 @@ class BCChannelType:
     WX = 'WX'
     WX_APP = 'WX_APP'
     WX_NATIVE = 'WX_NATIVE'
+    WX_SCAN = 'WX_SCAN'
     WX_JSAPI = 'WX_JSAPI'
     WX_REDPACK = 'WX_REDPACK'
     WX_TRANSFER = 'WX_TRANSFER'
@@ -47,6 +48,7 @@ class BCChannelType:
     ALI_WAP = 'ALI_WAP'
     ALI_QRCODE = 'ALI_QRCODE'
     ALI_OFFLINE_QRCODE = 'ALI_OFFLINE_QRCODE'
+    ALI_SCAN  = 'ALI_SCAN'
     ALI_TRANSFER = 'ALI_TRANSFER'
 
     UN = 'UN'
@@ -92,6 +94,8 @@ class BCChannelType:
     BC_NATIVE = 'BC_NATIVE'
     BC_WX_WAP = 'BC_WX_WAP'
     BC_ALI_QRCODE = 'BC_ALI_QRCODE'
+    BC_ALI_SCAN = 'BC_ALI_SCAN'
+    BC_WX_SCAN = 'BC_WX_SCAN'
 
 
 class BCReqType:
