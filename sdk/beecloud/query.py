@@ -273,7 +273,7 @@ class BCQuery:
         query offline bill status
         refer to https://beecloud.cn/doc/?index=rest-api-offline #3
         :param bill_no: bill number
-        :param channel: bill payment channel line WX_SCAN
+        :param channel: bill payment channel like WX_SCAN
         :return: beecloud.entity.BCResult
         """
         if self.bc_app.is_test_mode:

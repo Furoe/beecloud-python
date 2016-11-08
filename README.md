@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.3.0-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.4.0-blue.svg)
 
 ## 简介
 
@@ -124,7 +124,8 @@ bc_query.register_app(bc_app)
 可以参考`demo.py`中`app_bill`
 
 #### 原型：
-通过`BCPay`的实例，以`pay`方法，结合`BCPayReqParams`参数，发起支付请求
+通过`BCPay`的实例，以`pay`方法，结合`BCPayReqParams`参数，发起支付请求；  
+对于线下收款，通过`offline_pay`方法发起请求，用户的支付结果通过`BCQuery`的`query_offline_bill_status`方法查询
 
 #### 调用：
 
