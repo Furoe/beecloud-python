@@ -22,6 +22,7 @@ app = Flask(__name__)
 bc_app = BCApp()
 bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
 bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
 
 '''
 推送标准：
@@ -38,12 +39,16 @@ def app_payment_webhook():
 
     # 第一步：验证数字签名
     # 从beecloud传回的sign
-    bc_sign = json_data.get('sign')
+    bc_sign = json_data.get('signature')
 
-    # 自己计算出sign -- App ID + App Secret + timestamp 的 MD5 生成的签名 (32字符十六进制)
-    timestamp = json_data.get('timestamp')
+    # 自己计算出sign -- app_id + transaction_id + transaction_type + channel_type + transaction_fee + master_secret 的MD5签名
+    transaction_id = json_data.get('transaction_id')
+    transaction_type = json_data.get('transaction_type')
+    channel_type = json_data.get('channel_type')
+    transaction_fee = json_data.get('transaction_fee')
 
-    my_sign = hashlib.md5((bc_app.app_id + bc_app.app_secret + str(timestamp)).encode('UTF-8')).hexdigest()
+    my_sign = hashlib.md5((bc_app.app_id + transaction_id + transaction_type + channel_type +
+                           str(transaction_fee) + bc_app.master_secret).encode('UTF-8')).hexdigest()
 
     # 判断两个sign是否一致
     if bc_sign != my_sign:
@@ -72,8 +77,7 @@ def app_payment_webhook():
     也有可能是BeeCloud的Webhook重试。
     客户需要根据订单号进行判重，忽略已经处理过的订单号对应的Webhook。
     '''
-    # 获取订单号
-    bill_num = json_data.get('transaction_id')
+    # 获取订单号，即上面的transaction_id
     '''
     以下为伪代码：
     #从自己系统的数据库中根据订单号取出订单数据，如发现已经支付成功，则忽略该订单
@@ -82,12 +86,11 @@ def app_payment_webhook():
         return ''
     '''
 
-    # 第三步：验证订单金额，以分为单位
-    bill_fee = json_data.get('transaction_fee')
+    # 第三步：验证订单金额，即上面的transaction_fee，以分为单位
     '''
     以下为伪代码：
     # 如果金额不匹配，表明订单可能被篡改
-    if bill_info.bill_fee != bill_fee:
+    if bill_info.bill_fee != transaction_fee:
         return ''
     '''
 

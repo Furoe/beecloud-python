@@ -8,7 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from beecloud.entity import BCChannelType, BCResult, BCReqType
+from beecloud.entity import BCChannelType, BCResult, BCReqType, _TmpObject
 from beecloud.utils import get_rest_root_url, http_post, http_put, set_common_attr, \
     report_not_supported_err, obj_to_dict, attach_app_sign
 
@@ -30,11 +30,17 @@ class BCPay:
         else:
             return get_rest_root_url() + 'rest/bill'
 
+    def _offline_pay_url(self):
+        return get_rest_root_url() + 'rest/offline/bill'
+
     def _international_pay_url(self):
         return get_rest_root_url() + 'rest/international/bill'
 
     def _bill_refund_url(self):
         return get_rest_root_url() + 'rest/refund'
+
+    def _offline_refund_url(self):
+        return get_rest_root_url() + 'rest/offline/refund'
 
     def _bill_transfer_url(self):
         return get_rest_root_url() + 'rest/transfer'
@@ -84,6 +90,42 @@ class BCPay:
                 bc_result.timestamp = resp_dict.get('timestamp')
                 bc_result.pay_sign = resp_dict.get('pay_sign')
                 bc_result.sign_type = resp_dict.get('sign_type')
+
+        return bc_result
+
+    def offline_pay(self, pay_params):
+        """
+        offline payment API, different channels have different requirements for request params
+        and the return params varies.
+        refer to restful API https://beecloud.cn/doc/?index=rest-api-offline #2
+        :param pay_params: beecloud.entity.BCPayReqParams
+        :return: beecloud.entity.BCResult
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('offline_pay')
+
+        attach_app_sign(pay_params, BCReqType.PAY, self.bc_app)
+        tmp_resp = http_post(self._offline_pay_url(), pay_params, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.id = resp_dict.get('id')
+
+            if resp_dict.get('pay_result') is not None:
+                setattr(bc_result, 'pay_result', resp_dict.get('pay_result'))
+            if resp_dict.get('code_url'):
+                setattr(bc_result, 'code_url', resp_dict.get('code_url'))
+            if resp_dict.get('channel_type'):
+                setattr(bc_result, 'channel_type', resp_dict.get('channel_type'))
 
         return bc_result
 
@@ -146,6 +188,69 @@ class BCPay:
             # if agree is true and refund successfully
             bc_result.result_map = resp_dict.get('result_map')
             bc_result.url = resp_dict.get('url')
+
+        return bc_result
+
+    def offline_revert(self, bill_no, channel=None, method='REVERT'):
+        """
+        offline payment revert API, WX_NATIVE is not supported
+        refer to restful API https://beecloud.cn/doc/?index=rest-api-offline #4
+        :param bill_no: bill number
+        :param channel: bill payment channel like ALI_SCAN
+        :param method: currently only support 'REVERT'
+        :return: beecloud.entity.BCResult
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('offline_revert')
+
+        tmp_obj = _TmpObject()
+        if channel:
+            setattr(tmp_obj, 'channel', channel)
+        setattr(tmp_obj, 'method', method)
+
+        attach_app_sign(tmp_obj, BCReqType.PAY, self.bc_app)
+        tmp_resp = http_post(self._offline_pay_url() + '/' + bill_no, tmp_obj, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            setattr(bc_result, "revert_status", resp_dict.get('revert_status'))
+
+        return bc_result
+
+    def offline_refund(self, refund_params):
+        """
+        offline payment refund API, refund fee should not be greater than bill total fee;
+        need_approval is not allowed for offline refund
+        refer to restful API https://beecloud.cn/doc/?index=rest-api-offline #6
+        :param refund_params: beecloud.entity.BCRefundReqParams
+        :return: beecloud.entity.BCResult
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('offline_refund')
+
+        attach_app_sign(refund_params, BCReqType.REFUND, self.bc_app)
+        tmp_resp = http_post(self._offline_refund_url(), refund_params, self.bc_app.timeout)
+
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+        bc_result = BCResult()
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            bc_result.id = resp_dict.get('id')
+            setattr(bc_result, "refund_result", resp_dict.get('refund_result'))
 
         return bc_result
 

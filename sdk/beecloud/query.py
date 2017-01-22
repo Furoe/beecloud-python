@@ -11,7 +11,7 @@
 from beecloud.entity import BCResult, BCBill, BCRefund, BCReqType, BCPlan, BCSubscription, _TmpObject
 from beecloud.utils import get_rest_root_url, http_get, obj_to_quote_str, set_common_attr, \
     report_not_supported_err, attach_app_sign, obj_to_dict, parse_dict_to_obj, rest_query_objects,\
-    rest_query_object_by_id
+    rest_query_object_by_id, http_post
 
 
 class _OrderType:
@@ -233,7 +233,7 @@ class BCQuery:
         :return: beecloud.entity.BCResult
         """
         if self.bc_app.is_test_mode:
-            return report_not_supported_err('query_refunds_count')
+            return report_not_supported_err('query_refund_by_id')
         return self._query_order_by_id(refund_id, _OrderType.REFUND)
 
     def query_refund_status(self, channel, refund_no):
@@ -245,7 +245,7 @@ class BCQuery:
         :return: beecloud.entity.BCResult
         """
         if self.bc_app.is_test_mode:
-            return report_not_supported_err('query_refunds_count')
+            return report_not_supported_err('query_refund_status')
 
         query_params = _TmpObject()
         query_params.channel = channel
@@ -265,6 +265,39 @@ class BCQuery:
 
         if not bc_result.result_code:
             bc_result.refund_status = resp_dict.get('refund_status')
+
+        return bc_result
+
+    def query_offline_bill_status(self, bill_no, channel=None):
+        """
+        query offline bill status
+        refer to https://beecloud.cn/doc/?index=rest-api-offline #3
+        :param bill_no: bill number
+        :param channel: bill payment channel like WX_SCAN
+        :return: beecloud.entity.BCResult
+        """
+        if self.bc_app.is_test_mode:
+            return report_not_supported_err('query_offline_bill_status')
+
+        query_params = _TmpObject()
+        setattr(query_params, 'bill_no', bill_no)
+        if channel:
+            setattr(query_params, 'channel', channel)
+        attach_app_sign(query_params, BCReqType.QUERY, self.bc_app)
+        url = get_rest_root_url() + 'rest/offline/bill/status'
+        tmp_resp = http_post(url, query_params, self.bc_app.timeout)
+        # if err encountered, [0] equals 0
+        if not tmp_resp[0]:
+            return tmp_resp[1]
+
+        # [1] contains result dict
+        resp_dict = tmp_resp[1]
+        bc_result = BCResult()
+
+        set_common_attr(resp_dict, bc_result)
+
+        if not bc_result.result_code:
+            setattr(bc_result, 'pay_result', resp_dict.get('pay_result'))
 
         return bc_result
 
