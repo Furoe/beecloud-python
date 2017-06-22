@@ -7,7 +7,7 @@
     :copyright (c) 2015 BeeCloud.
     :license: MIT, see LICENSE for more details.
 """
-
+from beecloud import BEECLOUD_PYTHON_SDK_VERSION
 from beecloud.entity import BCChannelType, BCResult, BCReqType, _TmpObject
 from beecloud.utils import get_rest_root_url, http_post, http_put, set_common_attr, \
     report_not_supported_err, obj_to_dict, attach_app_sign
@@ -59,6 +59,8 @@ class BCPay:
         :param pay_params: beecloud.entity.BCPayReqParams
         :return: beecloud.entity.BCResult
         """
+        self._add_sdk_version(pay_params)
+
         attach_app_sign(pay_params, BCReqType.PAY, self.bc_app)
         tmp_resp = http_post(self._bill_pay_url(), pay_params, self.bc_app.timeout)
 
@@ -93,6 +95,9 @@ class BCPay:
 
         return bc_result
 
+    def _add_sdk_version(self, pay_params):
+        setattr(pay_params, "bc_analysis", {'sdk_version': 'PYTHON_' + BEECLOUD_PYTHON_SDK_VERSION})
+
     def offline_pay(self, pay_params):
         """
         offline payment API, different channels have different requirements for request params
@@ -103,6 +108,8 @@ class BCPay:
         """
         if self.bc_app.is_test_mode:
             return report_not_supported_err('offline_pay')
+
+        self._add_sdk_version(pay_params)
 
         attach_app_sign(pay_params, BCReqType.PAY, self.bc_app)
         tmp_resp = http_post(self._offline_pay_url(), pay_params, self.bc_app.timeout)

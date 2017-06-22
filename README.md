@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.4.0-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.4.1-blue.svg)
 
 ## 简介
 
@@ -16,7 +16,7 @@ SDK支持以下支付渠道:
  * 京东
  * 易宝、快钱等
 
-并且包含退款、打款、订阅支付和相应的查询功能，适用于python2.7、python3.4、python3.5。
+并且包含退款、打款、订阅支付和相应的查询功能，适用于python2.7、python3.4、python3.5、python3.6。
 
 
 ## 安装 Python SDK
