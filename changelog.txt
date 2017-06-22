@@ -1,5 +1,8 @@
 BeeCloud Python Changelog
 =============================
+v3.4.1 发布日期：2017年6月22日
+在bc analysis添加sdk version
+
 v3.4.0 发布日期：2016年11月2日
 添加线下支付接口
 
