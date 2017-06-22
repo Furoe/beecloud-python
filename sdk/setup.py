@@ -12,7 +12,7 @@ except ImportError:
 
 setup(
     name='beecloud',
-    version='3.4.0',
+    version='3.4.1',
     packages=['beecloud'],
     url='https://beecloud.cn/',
     license='MIT License',
@@ -21,7 +21,7 @@ setup(
     description='beecloud, make payment simpler',
     install_requires=['requests'],
     zip_safe=False,
-    platforms='2.7, 3.4, 3.5',
+    platforms='2.7, 3.4, 3.5, 3.6',
     keywords=('beecloud', 'pay'),
     classifiers=[
         'Intended Audience :: Developers',
@@ -33,6 +33,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
 )
