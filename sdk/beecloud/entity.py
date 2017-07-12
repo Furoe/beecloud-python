@@ -122,6 +122,9 @@ class BCPayReqParams:
         # 附加数据
         self.optional = None
 
+        # 商家用户ID，如果传入可以在控制台查看用户行为
+        self.buyer_id = None
+
         # 分析数据
         self.analysis = None
 
@@ -552,6 +555,45 @@ class BCSubscription:
 
         # 订阅是否已经生效，查询时返回
         self.valid = None
+
+
+class BCMerchantUser:
+    def __init__(self):
+        # 商户的标识，email或者手机号
+        self.merchant = None
+
+        # 用户注册时关联的app
+        self.app_id = None
+
+        # 用户的ID
+        self.buyer_id = None
+
+        # 用户姓名
+        self.name = None
+
+        # 用户身份证号
+        self.id_no = None
+
+        # 提现卡号
+        self.card_no = None
+
+        # 银行卡绑定的手机号
+        self.mobile = None
+
+        # 银行全称
+        self.bank_name = None
+
+        # 用户类型（等级）。默认为一般用户，默认值0；1 - 认证用户，需通过二要素验证；2 - 可提现用户，需通过四要素认证
+        self.buyer_type = None
+
+        # 提现卡类型。0 - 借记卡，1 - 信用卡
+        self.card_type = None
+
+        # 该用户注册时间
+        self.createdat = None
+
+        # 用户信息修改时间
+        self.updatedat = None
 
 
 class _TmpObject:

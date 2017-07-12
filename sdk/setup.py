@@ -12,7 +12,7 @@ except ImportError:
 
 setup(
     name='beecloud',
-    version='3.4.1',
+    version='3.5.0',
     packages=['beecloud'],
     url='https://beecloud.cn/',
     license='MIT License',

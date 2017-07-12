@@ -1,4 +1,5 @@
 *.swp
+.DS_Store
 demo/.idea/*
 sdk/.idea/*
 sdk/beecloud/__pycache__/*

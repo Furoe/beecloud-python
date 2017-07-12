@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.4.1-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.5.0-blue.svg)
 
 ## 简介
 
@@ -500,6 +500,7 @@ result = bc_query.query_subscriptions()
   
 ### 14.鉴权
 调用`beecloud.utils`中`verify_card_factors`方法，依次传入参数`BCApp`实例、姓名、身份证号、银行卡号、银行预留手机号做四要素鉴权，手机号不传入则三要素鉴权，银行卡号也不传入则二要素鉴权  
+  
 ```python
 result = verify_card_factors(bc_app,
                              'name',
@@ -508,6 +509,62 @@ result = verify_card_factors(bc_app,
                              'phone number')
 ```
 result中result_code为0表示鉴权成功。
+
+### 15.商家用户系统
+商家可以选择上传用户ID，然后在控制台查看用户行为分析  
+调用`beecloud.user`模块中相关方法  
+
+* **注册单个用户**  
+
+调用`add_merchant_user`方法，依次传入参数`BCApp`实例和用户在商家唯一标识符ID，返回result_code为0表示成功  
+
+```python
+add_merchant_user(bc_app, 'merchant_python_user1')
+```
+  
+* **批量导入用户**  
+
+调用`batch_add_merchant_users`方法，依次传入参数`BCApp`实例，商家账户和用户ID列表，返回result_code为0表示成功  
+
+```python
+batch_add_merchant_users(bc_app, 'merchant@email.cn', ['merchant_python_user2', 'merchant_python_user3'])
+```
+
+* **用户批量查询**  
+
+调用`query_merchant_users`方法，  
+选填参数`merchant`如果传入则查询该商家下所有注册过的用户，否则查询注册时与app关联的用户；  
+选填参数`start_time`如果传入返回此时间戳之后创建的用户；  
+选填参数`end_time`如果传入返回此时间戳之前创建的用户  
+
+```python
+res = query_merchant_users(bc_app, start_time=1499788800000)
+if not res.result_code:
+    for user in res.users:
+        print(user.buyer_id)
+```
+
+* **历史数据补全**  
+
+调用`attach_buyer_history_bills`方法，将历史订单和购买用户关联   
+参数`bill_info`整体为字典类型，用户ID作为key，该用户的订单号列表作为value，  
+如果修改失败，返回`failed_bills`，结构和`bill_info`一样  
+
+```python
+bill_info = {'merchant_python_user1': ['test1499839192'],
+             'merchant_python_user2': ['test1499839169', 'test1499839127']}
+res = attach_buyer_history_bills(bc_app, bill_info)
+```
+
+* **关于新下单的说明**  
+
+务必在下单时传入`buyer_id`，表示当前订单的购买用户  
+
+```python
+req_params = BCPayReqParams()
+req_params.buyer_id = 'merchant_python_user1'
+...
+```
 
 
 ## Demo
