@@ -148,17 +148,3 @@ def attach_buyer_history_bills(bc_app, bill_info):
         bc_result.failed_bills = resp_dict.get('failed_bills')
 
     return bc_result
-
-
-if __name__ == '__main__':
-    from beecloud.entity import BCApp, BCQueryReqParams
-
-    bc_app = BCApp()
-
-    bc_app.app_id = 'beacfdf5-badd-4a11-9b23-9ef3801732d1'
-    bc_app.app_secret = '0fa599d9-b0ae-41b3-85de-d3153809004d'
-
-    result = add_merchant_user(bc_app, 'xz-test-buyer1')
-    if result.result_code:
-        print(result.err_detail)
-

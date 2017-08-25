@@ -92,11 +92,9 @@ def _deal_with_normal_pay(channel, open_id, bank=None):
 
     req_params.channel = channel
     req_params.title = u'python {:s} 支付测试'.format(channel)
-    req_params.total_fee = 103
-    req_params.coupon_id = 'ae0c56e1-d9ea-4353-8368-0b5777327f8a'
+    req_params.total_fee = 2
     req_params.bill_no = order_num_on_datetime()
     req_params.optional = {'lang': 'python', u'中文key': u'中文value'}
-    req_params.notify_url = 'http://115.28.40.236:8080/webhook/payment'
     # 支付完成后的跳转页面
     req_params.return_url = 'https://beecloud.cn/'
     # 支付宝网页支付(ALI_WEB)的选填参数，可以为商品详细页的url
@@ -163,7 +161,7 @@ def app_query_bills():
     query_params = BCQueryReqParams()
     if request.args.get('channel', '') != 'ALL':
         query_params.channel = request.args.get('channel', '')
-    # query_params.spay_result = True
+    query_params.spay_result = True
 
     result = bc_query.query_bills(query_params)
     if result.result_code:
