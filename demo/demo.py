@@ -23,16 +23,9 @@ app = Flask(__name__)
 # init
 bc_app = BCApp()
 # bc_app.is_test_mode = True
-# bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
-# bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
-# bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
-
-# bc_app.app_id = 'beacfdf5-badd-4a11-9b23-9ef3801732d1'
-# bc_app.app_secret = '0fa599d9-b0ae-41b3-85de-d3153809004d'
-
-bc_app.app_id = 'c37d661d-7e61-49ea-96a5-68c34e83db3b'
-bc_app.app_secret = 'c37d661d-7e61-49ea-96a5-68c34e83db3b'
-
+bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
+bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
 # bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
 # 以下是jsapi的测试参数
