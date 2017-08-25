@@ -23,9 +23,16 @@ app = Flask(__name__)
 # init
 bc_app = BCApp()
 # bc_app.is_test_mode = True
-bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
-bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
-bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+# bc_app.app_id = 'c5d1cba1-5e3f-4ba0-941d-9b0a371fe719'
+# bc_app.app_secret = '39a7a518-9ac8-4a9e-87bc-7885f33cf18c'
+# bc_app.master_secret = 'e14ae2db-608c-4f8b-b863-c8c18953eef2'
+
+# bc_app.app_id = 'beacfdf5-badd-4a11-9b23-9ef3801732d1'
+# bc_app.app_secret = '0fa599d9-b0ae-41b3-85de-d3153809004d'
+
+bc_app.app_id = 'c37d661d-7e61-49ea-96a5-68c34e83db3b'
+bc_app.app_secret = 'c37d661d-7e61-49ea-96a5-68c34e83db3b'
+
 # bc_app.test_secret = '4bfdd244-574d-4bf3-b034-0c751ed34fee'
 
 # 以下是jsapi的测试参数
@@ -85,9 +92,11 @@ def _deal_with_normal_pay(channel, open_id, bank=None):
 
     req_params.channel = channel
     req_params.title = u'python {:s} 支付测试'.format(channel)
-    req_params.total_fee = 2
+    req_params.total_fee = 103
+    req_params.coupon_id = 'ae0c56e1-d9ea-4353-8368-0b5777327f8a'
     req_params.bill_no = order_num_on_datetime()
     req_params.optional = {'lang': 'python', u'中文key': u'中文value'}
+    req_params.notify_url = 'http://115.28.40.236:8080/webhook/payment'
     # 支付完成后的跳转页面
     req_params.return_url = 'https://beecloud.cn/'
     # 支付宝网页支付(ALI_WEB)的选填参数，可以为商品详细页的url
@@ -154,7 +163,7 @@ def app_query_bills():
     query_params = BCQueryReqParams()
     if request.args.get('channel', '') != 'ALL':
         query_params.channel = request.args.get('channel', '')
-    query_params.spay_result = True
+    # query_params.spay_result = True
 
     result = bc_query.query_bills(query_params)
     if result.result_code:

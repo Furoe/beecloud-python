@@ -33,6 +33,9 @@
             <th>订单是否成功</th>
             <th>商品标题</th>
             <th>订单金额/分</th>
+            <th>实付金额/分</th>
+            <th>优惠金额/分</th>
+            <th>优惠券ID/分</th>
             <!-- <th>渠道详细信息</th> -->
             <th>订单是否已经撤销</th>
             <th>订单是否已经退款</th>
@@ -51,7 +54,10 @@
             <!-- <td>{{ bill.optional }}</td>  -->
             <td>{{ bill.spay_result  }}</td>
             <td>{{ bill.title }}</td>
+            <td>{{ bill.bill_fee }}</td>
             <td>{{ bill.total_fee }}</td>
+            <td>{{ bill.discount }}</td>
+            <td>{{ bill.coupon_id }}</td>
             <!-- <td>{{ bill.message_detail }}</td>  -->
             <td>{{ bill.revert_result  }}</td>
             <td>{{ bill.refund_result }}</td>

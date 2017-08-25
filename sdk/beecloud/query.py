@@ -401,3 +401,28 @@ class BCQuery:
         """
         return rest_query_object_by_id(self.bc_app, self._query_subscription_url(), subscription_id,
                                        'subscription', BCSubscription)
+
+
+if __name__ == '__main__':
+    from beecloud.entity import BCApp, BCQueryReqParams
+
+
+    bc_app = BCApp()
+
+    bc_app.app_id = 'beacfdf5-badd-4a11-9b23-9ef3801732d1'
+    bc_app.app_secret = '0fa599d9-b0ae-41b3-85de-d3153809004d'
+
+    bc_query = BCQuery()
+    bc_query.register_app(bc_app)
+
+    query_params = BCQueryReqParams()
+    query_params.start_time = 1500606000000
+    query_params.end_time = 1500631200000
+
+    result = bc_query.query_bills(query_params)
+    if result.result_code:
+        print(result.err_detail)
+
+    for bill in result.bills:
+        print()
+

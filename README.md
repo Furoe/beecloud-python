@@ -1,6 +1,6 @@
 ## BeeCloud Python SDK (Open Source)
 
-[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.5.0-blue.svg)
+[![Build Status](https://travis-ci.org/beecloud/beecloud-python.svg)](https://travis-ci.org/beecloud/beecloud-python) ![license](https://img.shields.io/badge/license-MIT-brightgreen.svg) ![version](https://img.shields.io/badge/version-v3.6.0-blue.svg)
 
 ## 简介
 
@@ -516,7 +516,7 @@ result中result_code为0表示鉴权成功。
 
 * **注册单个用户**  
 
-调用`add_merchant_user`方法，依次传入参数`BCApp`实例和用户在商家唯一标识符ID，返回result_code为0表示成功  
+调用`add_merchant_user`方法，依次传入参数`BCApp`实例和用户在商家唯一标识符ID，返回result\_code为0表示成功  
 
 ```python
 add_merchant_user(bc_app, 'merchant_python_user1')
@@ -524,7 +524,7 @@ add_merchant_user(bc_app, 'merchant_python_user1')
   
 * **批量导入用户**  
 
-调用`batch_add_merchant_users`方法，依次传入参数`BCApp`实例，商家账户和用户ID列表，返回result_code为0表示成功  
+调用`batch_add_merchant_users`方法，依次传入参数`BCApp`实例，商家账户和用户ID列表，返回result\_code为0表示成功  
 
 ```python
 batch_add_merchant_users(bc_app, 'merchant@email.cn', ['merchant_python_user2', 'merchant_python_user3'])
@@ -563,6 +563,103 @@ res = attach_buyer_history_bills(bc_app, bill_info)
 ```python
 req_params = BCPayReqParams()
 req_params.buyer_id = 'merchant_python_user1'
+...
+```
+  
+### 16.营销卡券系统
+商家可以通过优惠券系统开展营销活动  
+调用`beecloud.sales`模块中相关方法  
+
+* **根据ID查询优惠券模板**  
+
+调用`query_coupon_template`方法，依次传入参数`BCApp`实例和优惠券模板ID，返回result\_code为0表示成功，返回的`coupon_template`字段见`beecloud.entity.BCCouponTemplate`
+
+```python
+result = query_coupon_template(bc_app, 'coupon-template-id')
+
+if result.result_code == 0:
+    template = result.coupon_template
+```
+  
+* **根据条件查询优惠券模板**  
+
+调用`query_coupon_templates`方法，依次传入参数`BCApp`实例和`BCQueryCriteria`实例，返回result\_code为0表示成功，返回的`coupon_templates`为`BCCouponTemplate`列表  
+
+```python
+query_criteria = BCQueryCriteria()
+query_criteria.name = 'template-name'
+
+result = query_coupon_templates(bc_app, query_criteria)
+
+if result.result_code == 0:
+    templates = result.coupon_templates
+
+    if templates and len(templates) > 0:
+        template = templates[0]
+        print(template.name)
+```
+
+* **发放优惠券**  
+
+调用`create_coupon`方法，依次传入参数`BCApp`实例、优惠券模板ID和用户ID，返回result\_code为0表示成功，返回的`coupon`字段见`beecloud.entity.BCCoupon`  
+
+```python
+result = create_coupon(bc_app, 'template-id', 'user-id')
+if result.result_code == 0:
+    coupon = result.coupon
+
+    if coupon:
+        print(coupon.id)
+
+        template = coupon.template
+        print(template.name)
+```
+
+* **根据ID查询优惠券**  
+
+调用`query_coupon`方法，依次传入参数`BCApp`实例和优惠券ID，返回result\_code为0表示成功，返回的`coupon`字段见`BCCoupon`  
+
+```python
+result = query_coupon(bc_app, 'coupon-id')
+if result.result_code == 0:
+    coupon = result.coupon
+
+    if coupon:
+        print(coupon.user_id)
+
+        template = coupon.template
+        print(template.name)
+```
+  
+* **根据条件查询优惠券**  
+
+调用`query_coupons`方法，依次传入参数`BCApp`实例和`BCQueryCriteria`实例，返回result\_code为0表示成功，返回的`coupons`为`BCCoupon`列表  
+
+```python
+query_criteria = BCQueryCriteria()
+query_criteria.template_id = 'template-id'
+
+result = query_coupons(bc_app, query_criteria)
+
+if result.result_code == 0:
+    coupons = result.coupons
+
+    if coupons and len(coupons) > 0:
+        coupon = coupons[0]
+
+        print(coupon.user_id)
+
+        template = coupon.template
+        print(template.name)
+```
+  
+* **关于新下单的说明**  
+
+在下单时传入`coupon_id`，表示当前订单使用的优惠券  
+
+```python
+req_params = BCPayReqParams()
+req_params.coupon_id = 'coupon-id'
 ...
 ```
 
