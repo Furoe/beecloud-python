@@ -6,7 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-BEECLOUD_PYTHON_SDK_VERSION = '3.5.0'
+BEECLOUD_PYTHON_SDK_VERSION = '3.6.0'
 BEECLOUD_API_HOST = 'https://api.beecloud.cn'
 
 BEECLOUD_RESTFUL_VERSION = '/2/'

@@ -125,6 +125,9 @@ class BCPayReqParams:
         # 商家用户ID，如果传入可以在控制台查看用户行为
         self.buyer_id = None
 
+        # 卡券ID，用于营销
+        self.coupon_id = None
+
         # 分析数据
         self.analysis = None
 
@@ -261,8 +264,17 @@ class BCBill:
         # 商品标题
         self.title = None
 
-        # 订单金额，单位为分
+        # 实付金额，单位为分
         self.total_fee = None
+
+        # 订单金额，单位为分
+        self.bill_fee = None
+
+        # 优惠金额，单位为分
+        self.discount = None
+
+        # 卡券ID，可能为空
+        self.coupon_id = None
 
         # 渠道详细信息
         self.message_detail = None
@@ -594,6 +606,96 @@ class BCMerchantUser:
 
         # 用户信息修改时间
         self.updatedat = None
+
+
+class BCCouponTemplate:
+    def __init__(self):
+        # 卡券模板ID
+        self.id = None
+
+        # 卡券模板名称
+        self.name = None
+
+        # 卡券类型，0表示满减，1表示折扣
+        self.type = None
+
+        # 限制满足额度的条件，以分为单位，0表示不限额，比如满100减10元，返回为10000
+        self.limit_fee = None
+
+        # 如果type为0，存储优惠金额，以元为单位，比如10表示减10元；如果type为1，存储折扣比例，例如0.9表示9折
+        self.discount = None
+
+        # 卡券总数，0表示不限制
+        self.total_count = None
+
+        # 每个人最多可以领取的卡券数量，0表示不限制
+        self.max_count_per_user = None
+
+        # 分发的卡券数量
+        self.deliver_count = None
+
+        # 使用卡券的数量
+        self.use_count = None
+
+        # 卡券有效期类型，1表示根据模板起止时间判断，2表示卡券发放日期后多少天内有效
+        self.expiry_type = None
+
+        # 卡券开始时间，可能为null
+        self.start_time = None
+
+        # 卡券结束时间，可能为null
+        self.end_time = None
+
+        # 卡券发放日期后多少天内有效，在expiry_type为2时有效
+        self.delivery_valid_days = None
+
+        # 0表示未开启，1表示正常使用，-1表示停止使用
+        self.status = None
+
+        # 卡券所属商家账户
+        self.mch_account = None
+
+        # 卡券所属应用
+        self.app_id = None
+
+        # 创建时间
+        self.created_at = None
+
+        # 更新时间
+        self.updated_at = None
+
+
+class BCCoupon:
+    def __init__(self):
+        # 卡券ID
+        self.id = None
+
+        # 卡券模板
+        self.template = None
+
+        # 卡券分发的用户ID，和下单的buyer_id匹配
+        self.user_id = None
+
+        # 卡券所属应用
+        self.app_id = None
+
+        # 0表示未使用，1表示已使用（核销）
+        self.status = None
+
+        # 分发时间
+        self.created_at = None
+
+        # 更新时间
+        self.updated_at = None
+
+        # 有效期开始时间
+        self.start_time = None
+
+        # 有效期结束时间
+        self.end_time = None
+
+        # 使用时间，可能为null
+        self.use_time = None
 
 
 class _TmpObject:

@@ -349,7 +349,7 @@ def rest_delete_object(bc_app, url, obj_id, **kwargs):
     return bc_result
 
 
-def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
+def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type, para_query_mode=False):
     """
     query object list by conditions
     :param bc_app: used to attach app sign
@@ -358,13 +358,20 @@ def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
                         more specific conditions can be attached to it
     :param json_obj_name: like 'plans' for plan list query
     :param object_type: object type like beecloud.entity.BCPlan
+    :param para_query_mode: true if query string is para={}, else k1=v1&k2=v2
     :return: beecloud.entity.BCResult
     """
     if not query_param:
         query_param = _TmpObject()
 
     attach_app_sign(query_param, BCReqType.QUERY, bc_app)
-    tmp_resp = http_get(url, bc_app.timeout, obj_to_dict(query_param))
+
+    if para_query_mode:
+        url = url + '?para=' + obj_to_quote_str(query_param)
+        tmp_resp = http_get(url, bc_app.timeout)
+    else:
+        tmp_resp = http_get(url, bc_app.timeout, obj_to_dict(query_param))
+
     # if err encountered, [0] equals 0
     if not tmp_resp[0]:
         return tmp_resp[1]
@@ -387,7 +394,7 @@ def rest_query_objects(bc_app, url, query_param, json_obj_name, object_type):
     return bc_result
 
 
-def rest_query_object_by_id(bc_app, url, obj_id, json_obj_name, object_type):
+def rest_query_object_by_id(bc_app, url, obj_id, json_obj_name, object_type, para_query_mode=False):
     """
     query object by id
     :param bc_app: used to attach app sign
@@ -395,11 +402,18 @@ def rest_query_object_by_id(bc_app, url, obj_id, json_obj_name, object_type):
     :param obj_id: object id
     :param json_obj_name: like 'plan' for plan query
     :param object_type: object type like beecloud.entity.BCPlan
+    :param para_query_mode: true if query string is para={}, else k1=v1&k2=v2
     :return: beecloud.entity.BCResult
     """
     query_param = _TmpObject()
     attach_app_sign(query_param, BCReqType.QUERY, bc_app)
-    tmp_resp = http_get(url + '/' + obj_id, bc_app.timeout, obj_to_dict(query_param))
+
+    if para_query_mode:
+        url = url + '/' + obj_id + '?para=' + obj_to_quote_str(query_param)
+        tmp_resp = http_get(url, bc_app.timeout)
+    else:
+        tmp_resp = http_get(url + '/' + obj_id, bc_app.timeout, obj_to_dict(query_param))
+
     # if err encountered, [0] equals 0
     if not tmp_resp[0]:
         return tmp_resp[1]
